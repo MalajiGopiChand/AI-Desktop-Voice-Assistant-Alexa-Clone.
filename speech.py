@@ -53,10 +53,18 @@ def _tts_worker():
         if text is None:
             break
             
-        v_idx = int(get_setting("voice_index", 1))
         voices = engine_ref.getProperty('voices')
-        if len(voices) > v_idx:
-            engine_ref.setProperty('voice', voices[v_idx].id)
+        zira_voice = next((v for v in voices if "zira" in v.name.lower() or "female" in v.name.lower()), None)
+        saved_voice_id = get_setting("voice_id")
+        if saved_voice_id:
+            try:
+                engine_ref.setProperty('voice', saved_voice_id)
+            except Exception:
+                pass
+        elif zira_voice:
+            engine_ref.setProperty('voice', zira_voice.id)
+        elif len(voices) > 1:
+            engine_ref.setProperty('voice', voices[1].id)
             
         print(f"Assistant: {text}")
         try:

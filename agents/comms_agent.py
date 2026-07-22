@@ -38,18 +38,39 @@ class CommsAgent(BaseAgent):
         time.sleep(2)
         pyautogui.hotkey("ctrl", "f")
         time.sleep(0.5)
-        pyautogui.write(contact, interval=0.05)
+        try:
+            import pyperclip
+            pyperclip.copy(contact)
+            pyautogui.hotkey("ctrl", "v")
+        except Exception:
+            pyautogui.write(contact, interval=0.05)
         time.sleep(1)
         pyautogui.press("enter")
+        time.sleep(0.5)
         return {"success": True, "message": f"Opened chat with {contact}", "data": {}}
 
     def _type_message(self, params):
         text = params.get("text", "")
-        pyautogui.write(text, interval=0.03)
+        try:
+            import pyperclip
+            pyperclip.copy(text)
+            pyautogui.hotkey("ctrl", "v")
+        except Exception:
+            pyautogui.write(text, interval=0.03)
         return {"success": True, "message": f"Typed: {text}", "data": {}}
 
     def _send_message(self, params):
+        text = params.get("text", "")
+        if text:
+            try:
+                import pyperclip
+                pyperclip.copy(text)
+                pyautogui.hotkey("ctrl", "v")
+                time.sleep(0.3)
+            except Exception:
+                pyautogui.write(text, interval=0.03)
         pyautogui.press("enter")
+        time.sleep(0.2)
         return {"success": True, "message": "Sent message", "data": {}}
 
     def _open_email(self, params):
@@ -65,7 +86,6 @@ class CommsAgent(BaseAgent):
         return {"success": True, "message": f"Composed email to {to}", "data": {}}
 
     def _send_email(self, params):
-        # Opens compose — user confirms send in mail client (safe default)
         return self._compose_email(params)
 
     def _open_whatsapp(self, params):
@@ -77,16 +97,27 @@ class CommsAgent(BaseAgent):
         contact = params.get("contact", "")
         message = params.get("message", "")
         os.system("start whatsapp:")
-        time.sleep(3)
+        time.sleep(2.5)
         pyautogui.hotkey("ctrl", "f")
         time.sleep(0.5)
-        pyautogui.write(contact, interval=0.05)
+        try:
+            import pyperclip
+            pyperclip.copy(contact)
+            pyautogui.hotkey("ctrl", "v")
+        except Exception:
+            pyautogui.write(contact, interval=0.05)
         time.sleep(1)
         pyautogui.press("enter")
-        time.sleep(0.5)
-        pyautogui.write(message, interval=0.03)
-        time.sleep(0.3)
-        pyautogui.press("enter")
+        time.sleep(0.6)
+        if message:
+            try:
+                import pyperclip
+                pyperclip.copy(message)
+                pyautogui.hotkey("ctrl", "v")
+            except Exception:
+                pyautogui.write(message, interval=0.03)
+            time.sleep(0.3)
+            pyautogui.press("enter")
         return {"success": True, "message": f"Sent message to {contact}", "data": {}}
 
     def _read_whatsapp(self, params):

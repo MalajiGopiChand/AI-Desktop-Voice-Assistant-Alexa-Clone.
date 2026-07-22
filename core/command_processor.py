@@ -199,14 +199,45 @@ class CommandProcessor:
                 r = self.agents["comms_agent"].execute("open_chat", {"contact": contact})
                 return r.get("message", f"Opened chat with {contact}.")
 
-        if command.startswith(("type message ", "type text ", "write message ")):
-            text = command.replace("type message ", "", 1).replace("type text ", "", 1).replace("write message ", "", 1).strip()
-            r = self.agents["comms_agent"].execute("type_message", {"text": text})
-            return r.get("message", f"Typed: {text}")
+        if command.startswith(("send message ", "type message ", "send text ", "type text ", "write message ")):
+            text = command.replace("send message ", "", 1).replace("type message ", "", 1).replace("send text ", "", 1).replace("type text ", "", 1).replace("write message ", "", 1).strip()
+            r = self.agents["comms_agent"].execute("send_message", {"text": text})
+            return r.get("message", f"Sent: {text}")
 
-        if command in ("send message", "send it", "send", "press enter to send"):
+        if command in ("send message", "send it", "send", "press enter to send", "send message now"):
             r = self.agents["comms_agent"].execute("send_message", {})
             return r.get("message", "Sent message.")
+
+        # --- Mouse Control Protocols ---
+        if any(w in command for w in ("move mouse", "move cursor", "mouse up", "mouse down", "mouse left", "mouse right")):
+            if "up" in command:
+                r = self.agents["desktop_agent"].execute("move_mouse", {"direction": "up", "amount": 150})
+            elif "down" in command:
+                r = self.agents["desktop_agent"].execute("move_mouse", {"direction": "down", "amount": 150})
+            elif "left" in command:
+                r = self.agents["desktop_agent"].execute("move_mouse", {"direction": "left", "amount": 150})
+            elif "right" in command:
+                r = self.agents["desktop_agent"].execute("move_mouse", {"direction": "right", "amount": 150})
+            else:
+                r = self.agents["desktop_agent"].execute("move_mouse", {"direction": "down", "amount": 150})
+            return r.get("message", "Moved mouse.")
+
+        if command in ("click", "left click", "mouse click", "click mouse", "click here"):
+            r = self.agents["desktop_agent"].execute("click", {"button": "left"})
+            return r.get("message", "Clicked mouse.")
+
+        if command in ("right click", "context menu"):
+            r = self.agents["desktop_agent"].execute("click", {"button": "right"})
+            return r.get("message", "Right clicked.")
+
+        if command in ("double click", "double click mouse"):
+            r = self.agents["desktop_agent"].execute("click", {"button": "double"})
+            return r.get("message", "Double clicked.")
+
+        if command in ("scroll down", "scroll up", "page down", "page up"):
+            direction = "up" if "up" in command else "down"
+            r = self.agents["desktop_agent"].execute("scroll", {"direction": direction})
+            return r.get("message", f"Scrolled {direction}.")
 
         # --- Chrome Profile & Browser Protocols ---
         if "chrome" in command and "profile" in command:
@@ -218,6 +249,24 @@ class CommandProcessor:
             query = command.replace("search youtube for", "").replace("search youtube", "").replace("play", "").replace("on youtube", "").replace("open youtube", "").strip()
             r = self.agents["browser_agent"].execute("search", {"query": query, "engine": "youtube"})
             return r.get("message", f"Searched YouTube for {query}.")
+
+        # --- Direct Website Opening Protocols ---
+        if any(w in command for w in ("netflix", "prime video", "hotstar", "jio hotstar")):
+            import webbrowser
+            if "netflix" in command:
+                webbrowser.open("https://www.netflix.com")
+                return "Opening Netflix in your browser."
+            elif "prime" in command:
+                webbrowser.open("https://www.primevideo.com")
+                return "Opening Prime Video in your browser."
+            else:
+                webbrowser.open("https://www.hotstar.com")
+                return "Opening Hotstar in your browser."
+
+        # --- Time-Based Greeting Protocols ---
+        if command in ("hello", "hello jarvis", "hi", "hi jarvis", "hey jarvis", "good morning", "good afternoon", "good evening", "good night", "jarvis online", "jarvis"):
+            from utils import get_time_greeting
+            return get_time_greeting("Gopi")
 
         if "time" in command and len(command.split()) <= 4:
             return get_time()

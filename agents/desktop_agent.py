@@ -55,6 +55,9 @@ class DesktopAgent(BaseAgent):
                 "restart": self._restart,
                 "lock": self._lock,
                 "sleep": self._sleep,
+                "click": self._click,
+                "move_mouse": self._move_mouse,
+                "scroll": self._scroll,
             }
             handler = handlers.get(action)
             if not handler:
@@ -62,6 +65,37 @@ class DesktopAgent(BaseAgent):
             return handler(params)
         except Exception as e:
             return {"success": False, "message": str(e), "data": {}}
+
+    def _click(self, params):
+        button = params.get("button", "left")
+        if button == "right":
+            pyautogui.rightClick()
+        elif button == "double":
+            pyautogui.doubleClick()
+        else:
+            pyautogui.click()
+        return {"success": True, "message": f"Executed {button} click", "data": {}}
+
+    def _move_mouse(self, params):
+        direction = params.get("direction", "down").lower()
+        amount = int(params.get("amount", 150))
+        x, y = 0, 0
+        if "up" in direction:
+            y = -amount
+        elif "down" in direction:
+            y = amount
+        elif "left" in direction:
+            x = -amount
+        elif "right" in direction:
+            x = amount
+        pyautogui.moveRel(x, y, duration=0.2)
+        return {"success": True, "message": f"Moved mouse {direction} by {amount}px", "data": {}}
+
+    def _scroll(self, params):
+        direction = params.get("direction", "down").lower()
+        clicks = -500 if "down" in direction else 500
+        pyautogui.scroll(clicks)
+        return {"success": True, "message": f"Scrolled {direction}", "data": {}}
 
     def _get_chrome_exe(self):
         candidates = [

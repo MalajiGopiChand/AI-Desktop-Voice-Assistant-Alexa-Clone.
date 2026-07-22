@@ -28,6 +28,18 @@ def system_info():
 
     return f"CPU is at {cpu_usage} percent. RAM usage is at {ram_usage} percent. {battery_status}"
 
+def get_time_greeting(name="Gopi"):
+    hour = datetime.datetime.now().hour
+    if 5 <= hour < 12:
+        period = "Good morning"
+    elif 12 <= hour < 17:
+        period = "Good afternoon"
+    elif 17 <= hour < 22:
+        period = "Good evening"
+    else:
+        period = "Good night"
+    return f"{period} Master {name}! I am online and ready to assist you."
+
 def get_time():
     now = datetime.datetime.now()
     return f"The current time is {now.strftime('%I:%M %p')}."

@@ -24,6 +24,19 @@ class VoiceEngine:
             text = self.tts_queue.get()
             if text is None:
                 break
+            try:
+                from database import get_setting
+                voices = self.engine_ref.getProperty("voices")
+                zira = next((v for v in voices if "zira" in v.name.lower() or "female" in v.name.lower()), None)
+                saved_id = get_setting("voice_id")
+                if saved_id:
+                    self.engine_ref.setProperty("voice", saved_id)
+                elif zira:
+                    self.engine_ref.setProperty("voice", zira.id)
+                elif len(voices) > 1:
+                    self.engine_ref.setProperty("voice", voices[1].id)
+            except Exception:
+                pass
             print(f"JARVIS: {text}")
             try:
                 self.set_widget_state("speaking")
