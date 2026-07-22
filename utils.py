@@ -1,7 +1,6 @@
 """
 Utilities Module.
 This module contains the actual actions the assistant can perform.
-Things like opening apps, checking system status, and web searches happen here.
 """
 
 import os
@@ -10,25 +9,17 @@ import webbrowser
 import subprocess
 import psutil
 import pyautogui
+pyautogui.FAILSAFE = False
 import wikipedia
 import datetime
-from config import DEFAULT_BROWSER
+import platform
 
 def system_info():
-    """
-    Gathers system information like CPU, RAM, and Battery.
-    Returns a string meant to be spoken by the assistant.
-    """
-    # CPU usage percentage
     cpu_usage = psutil.cpu_percent(interval=0.5)
-    
-    # RAM usage percentage
     memory_info = psutil.virtual_memory()
     ram_usage = memory_info.percent
     
-    # Battery information (if available, e.g., on a laptop)
     battery = psutil.sensors_battery()
-    battery_status = ""
     if battery:
         plugged = "plugged in and charging" if battery.power_plugged else "not plugged in"
         battery_status = f"Battery is at {battery.percent} percent and is {plugged}."
@@ -38,24 +29,25 @@ def system_info():
     return f"CPU is at {cpu_usage} percent. RAM usage is at {ram_usage} percent. {battery_status}"
 
 def get_time():
-    """Returns the current time in a spoken format."""
     now = datetime.datetime.now()
     return f"The current time is {now.strftime('%I:%M %p')}."
 
 def get_date():
-    """Returns the current date in a spoken format."""
     now = datetime.datetime.now()
     return f"Today is {now.strftime('%B %d, %Y')}."
 
 def open_app(app_name):
-    """
-    Tries to open a known application.
-    This uses basic Windows commands or known paths.
-    """
     app_name = app_name.lower()
-    
     try:
-        if "notepad" in app_name:
+        if "chrome" in app_name:
+            if platform.system() == "Windows":
+                # Ensure we pass the whole string so arguments like --profile-directory work
+                chrome_cmd = app_name if app_name.startswith("chrome") else "chrome"
+                os.system(f"start {chrome_cmd}")
+            else:
+                webbrowser.open("http://www.google.com")
+            return f"Opening {app_name}."
+        elif "notepad" in app_name:
             subprocess.Popen("notepad.exe")
             return "Opening Notepad."
         elif "calculator" in app_name or "calc" in app_name:
@@ -65,27 +57,26 @@ def open_app(app_name):
             subprocess.Popen("mspaint.exe")
             return "Opening Paint."
         elif "task manager" in app_name:
-            # Task manager shortcut
             pyautogui.hotkey('ctrl', 'shift', 'esc')
             return "Opening Task Manager."
         elif "file explorer" in app_name or "my computer" in app_name:
-            # Windows key + E opens Explorer
             pyautogui.hotkey('win', 'e')
             return "Opening File Explorer."
-        elif "browser" in app_name or "chrome" in app_name:
-            # Tries to open the default browser or Chrome if requested
+        elif "browser" in app_name:
             webbrowser.open("http://www.google.com")
             return "Opening browser."
+        elif "whatsapp" in app_name:
+            os.system("start whatsapp:")
+            return "Opening WhatsApp."
         elif "code" in app_name or "vs code" in app_name:
-            # Assumes VS Code is in the system PATH
             os.system("code")
             return "Opening VS Code."
         else:
-            # Fallback: search Windows using the start menu
+            # Fallback to searching the start menu using pyautogui
             pyautogui.press('win')
-            time.sleep(0.5)
-            pyautogui.write(app_name)
-            time.sleep(0.5)
+            time.sleep(1.5) # Give start menu time to open
+            pyautogui.write(app_name, interval=0.1)
+            time.sleep(1.5) # Give search time to find the app
             pyautogui.press('enter')
             return f"Trying to open {app_name} from the start menu."
     except Exception as e:
@@ -93,39 +84,27 @@ def open_app(app_name):
         return f"Sorry, I encountered an error trying to open {app_name}."
 
 def web_search(query):
-    """
-    Performs a web search based on the query.
-    Can search Wikipedia, YouTube, or Google.
-    """
     query = query.lower()
-    
     if "wikipedia" in query:
-        # Extract the search term (remove "search wikipedia for")
         search_term = query.replace("search wikipedia for", "").replace("wikipedia", "").replace("search", "").strip()
         try:
-            # Get a summary of the topic (limit to 2 sentences)
             result = wikipedia.summary(search_term, sentences=2)
             return f"According to Wikipedia: {result}"
-        except wikipedia.exceptions.DisambiguationError:
-            return "There are too many results for that topic. Please be more specific."
-        except wikipedia.exceptions.PageError:
-            return "I couldn't find a Wikipedia page for that."
+        except:
+            return "I couldn't find a clear Wikipedia page for that."
             
     elif "youtube" in query:
         search_term = query.replace("search youtube for", "").replace("youtube", "").replace("search", "").strip()
         url = f"https://www.youtube.com/results?search_query={search_term}"
         webbrowser.open(url)
         return f"Opening YouTube search results for {search_term}."
-        
     else:
-        # Default Google search
         search_term = query.replace("search for", "").replace("search google for", "").replace("search", "").strip()
         url = f"https://www.google.com/search?q={search_term}"
         webbrowser.open(url)
         return f"Here is what I found on Google for {search_term}."
 
 def open_website(url_name):
-    """Opens common websites directly."""
     websites = {
         "google": "https://www.google.com",
         "youtube": "https://www.youtube.com",
@@ -133,97 +112,80 @@ def open_website(url_name):
         "chatgpt": "https://chat.openai.com",
         "github": "https://github.com"
     }
-    
     for key, url in websites.items():
         if key in url_name.lower():
             webbrowser.open(url)
             return f"Opening {key}."
             
-    # If not in the list, just append .com
-    target = url_name.replace("open ", "").strip()
-    # Remove any spaces in target
-    target = target.replace(" ", "")
+    target = url_name.replace("open ", "").strip().replace(" ", "")
     webbrowser.open(f"https://www.{target}.com")
     return f"Opening {target} dot com."
 
 def automate_task(task):
-    """
-    Performs simple desktop automation using pyautogui.
-    """
     task = task.lower()
-    
     try:
         if "screenshot" in task:
-            # Capture the screen and save it
             screenshot = pyautogui.screenshot()
             file_name = f"screenshot_{int(time.time())}.png"
             screenshot.save(file_name)
-            return f"Screenshot saved as {file_name}."
-            
+            return f"Screenshot saved."
         elif "volume up" in task or "increase volume" in task:
-            for _ in range(5):
-                pyautogui.press('volumeup')
+            for _ in range(5): pyautogui.press('volumeup')
             return "Volume increased."
-            
         elif "volume down" in task or "decrease volume" in task:
-            for _ in range(5):
-                pyautogui.press('volumedown')
+            for _ in range(5): pyautogui.press('volumedown')
             return "Volume decreased."
-            
         elif "mute" in task:
             pyautogui.press('volumemute')
             return "Muted system volume."
-            
         elif "copy" in task:
             pyautogui.hotkey('ctrl', 'c')
             return "Copied to clipboard."
-            
         elif "paste" in task:
             pyautogui.hotkey('ctrl', 'v')
             return "Pasted from clipboard."
-            
         elif "select all" in task:
             pyautogui.hotkey('ctrl', 'a')
             return "Selected all text."
-            
+        elif "play" in task or "pause" in task:
+            import keyboard
+            keyboard.send('play/pause media')
+            return "Toggled play/pause."
+        elif "skip" in task or "next" in task:
+            import keyboard
+            keyboard.send('next track')
+            return "Skipped to next track."
+        elif "previous" in task or "back" in task:
+            import keyboard
+            keyboard.send('previous track')
+            return "Went to previous track."
         elif "type" in task:
-            # Example: "type hello world"
+            import keyboard
             text_to_type = task.replace("type", "", 1).strip()
-            pyautogui.write(text_to_type, interval=0.05)
+            keyboard.write(text_to_type, delay=0.05)
             return f"Typed: {text_to_type}"
-            
         elif "press enter" in task or "hit enter" in task:
             pyautogui.press('enter')
             return "Pressed Enter."
-            
         elif "press escape" in task:
             pyautogui.press('esc')
             return "Pressed Escape."
-            
         else:
             return "I don't know how to automate that task yet."
-            
     except Exception as e:
         print(f"Automation error: {e}")
         return "An error occurred during automation."
 
 def system_power(action):
-    """
-    Handles system shutdown, restart, lock, and sleep.
-    """
     action = action.lower()
-    
     try:
         if "shutdown" in action or "shut down" in action:
-            # /s = shutdown, /t 1 = time 1 second
             os.system("shutdown /s /t 1")
             return "Shutting down the computer."
         elif "restart" in action:
-            # /r = restart
             os.system("shutdown /r /t 1")
             return "Restarting the computer."
         elif "lock" in action:
-            # Windows lock command
             os.system("rundll32.exe user32.dll,LockWorkStation")
             return "Locking the computer."
         elif "sleep" in action:
@@ -232,3 +194,58 @@ def system_power(action):
     except Exception as e:
         print(f"Power command error: {e}")
         return "Failed to execute power command."
+
+def ask_ai(prompt):
+    """Uses Groq LLM via shared client."""
+    try:
+        from core.brain import brain
+        return brain.converse(prompt)
+    except Exception as e:
+        print(f"AI Error: {e}")
+        return "I am unable to connect to the AI service. Please configure your Groq API key."
+
+def execute_complex_automation(command):
+    """Delegate multi-step UI automation to the automation agent."""
+    try:
+        from agents.automation_agent import AutomationAgent
+        agent = AutomationAgent()
+        result = agent.execute("parse_and_run", {"command": command})
+        return result.get("message", "Automation finished.")
+    except Exception as e:
+        print(f"Automation Parser Error: {e}")
+        return "An error occurred while executing the complex automation."
+
+
+def auto_learn_command(command):
+    """Parse natural language training and save as custom command."""
+    try:
+        from core.llm_client import chat, FAST_MODEL
+        from database import add_custom_command
+        import json
+
+        system_prompt = """Extract trigger phrase and action from the user's training instruction.
+Valid action_types: "open", "url", "speak".
+Reply ONLY JSON: {"trigger": "...", "action_type": "...", "action_value": "..."}"""
+
+        raw = chat(
+            [{"role": "system", "content": system_prompt}, {"role": "user", "content": command}],
+            model=FAST_MODEL,
+            max_tokens=150,
+            temperature=0.1,
+        )
+        if raw.startswith("```"):
+            raw = raw.split("```")[1]
+            if raw.startswith("json"):
+                raw = raw[4:]
+        data = json.loads(raw.strip())
+        trigger = data.get("trigger", "").lower().strip()
+        action_type = data.get("action_type")
+        action_value = data.get("action_value")
+        if trigger and action_type and action_value:
+            if add_custom_command(trigger, action_type, action_value):
+                return f"Got it! When you say '{trigger}', I will {action_type} {action_value}."
+            return "Failed to save the command."
+        return "I couldn't understand what you wanted me to learn."
+    except Exception as e:
+        print(f"Auto-learn Error: {e}")
+        return "Please configure your Groq API key in Settings, then try again."

@@ -1,0 +1,183 @@
+import os
+import time
+import platform
+import subprocess
+import pyautogui
+from agents.base_agent import BaseAgent
+
+pyautogui.FAILSAFE = False
+
+APP_MAP = {
+    "chrome": "chrome",
+    "google chrome": "chrome",
+    "notepad": "notepad",
+    "calculator": "calc",
+    "calc": "calc",
+    "paint": "mspaint",
+    "vscode": "code",
+    "vs code": "code",
+    "visual studio code": "code",
+    "spotify": "spotify",
+    "discord": "discord",
+    "telegram": "telegram",
+    "whatsapp": "whatsapp:",
+    "file explorer": "explorer",
+    "explorer": "explorer",
+    "cmd": "cmd",
+    "command prompt": "cmd",
+    "task manager": "taskmgr",
+    "word": "winword",
+    "excel": "excel",
+    "powerpoint": "powerpnt",
+}
+
+
+class DesktopAgent(BaseAgent):
+    def __init__(self):
+        super().__init__("desktop_agent")
+
+    def execute(self, action, params):
+        try:
+            handlers = {
+                "open_app": self._open_app,
+                "type": self._type,
+                "press": self._press,
+                "hotkey": self._hotkey,
+                "wait": self._wait,
+                "screenshot": self._screenshot,
+                "switch_window": self._switch_window,
+                "close_window": self._close_window,
+                "open_folder": self._open_folder,
+                "move_file": self._move_file,
+                "rename_file": self._rename_file,
+                "delete_file": self._delete_file,
+                "shutdown": self._shutdown,
+                "restart": self._restart,
+                "lock": self._lock,
+                "sleep": self._sleep,
+            }
+            handler = handlers.get(action)
+            if not handler:
+                return {"success": False, "message": f"Unknown action: {action}", "data": {}}
+            return handler(params)
+        except Exception as e:
+            return {"success": False, "message": str(e), "data": {}}
+
+    def _get_chrome_exe(self):
+        candidates = [
+            r"C:\Program Files\Google\Chrome\Application\chrome.exe",
+            r"C:\Program Files (x86)\Google\Chrome\Application\chrome.exe",
+            os.path.expandvars(r"%LocalAppData%\Google\Chrome\Application\chrome.exe"),
+        ]
+        return next((c for c in candidates if os.path.exists(c)), "chrome")
+
+    def _open_app(self, params):
+        app_name = params.get("app_name", "").lower().strip()
+        profile = params.get("profile", "")
+
+        if "chrome" in app_name:
+            exe = self._get_chrome_exe()
+            if profile:
+                cmd = f'"{exe}" --profile-directory="{profile}"'
+            else:
+                cmd = f'"{exe}"'
+            subprocess.Popen(cmd, shell=True)
+            msg = f"Opened Chrome with profile {profile}" if profile else "Opened Chrome"
+            return {"success": True, "message": msg, "data": {}}
+
+        for key, launch in APP_MAP.items():
+            if key in app_name:
+                if platform.system() == "Windows":
+                    if launch == "whatsapp:":
+                        os.system("start whatsapp:")
+                    elif launch == "explorer":
+                        pyautogui.hotkey("win", "e")
+                    else:
+                        subprocess.Popen(f"start {launch}", shell=True)
+                return {"success": True, "message": f"Opened {app_name}", "data": {}}
+
+        pyautogui.press("win")
+        time.sleep(0.6)
+        pyautogui.write(app_name, interval=0.05)
+        time.sleep(0.6)
+        pyautogui.press("enter")
+        return {"success": True, "message": f"Opening {app_name} from Start menu", "data": {}}
+
+    def _type(self, params):
+        text = params.get("text", "")
+        pyautogui.write(text, interval=0.04)
+        return {"success": True, "message": "Typed text", "data": {}}
+
+    def _press(self, params):
+        key = params.get("key", "")
+        pyautogui.press(key)
+        return {"success": True, "message": f"Pressed {key}", "data": {}}
+
+    def _hotkey(self, params):
+        keys = params.get("keys", [])
+        pyautogui.hotkey(*keys)
+        return {"success": True, "message": f"Pressed {'+'.join(keys)}", "data": {}}
+
+    def _wait(self, params):
+        seconds = float(params.get("seconds", 1))
+        time.sleep(seconds)
+        return {"success": True, "message": f"Waited {seconds}s", "data": {}}
+
+    def _screenshot(self, params):
+        shot = pyautogui.screenshot()
+        path = params.get("path") or f"screenshot_{int(time.time())}.png"
+        shot.save(path)
+        return {"success": True, "message": f"Screenshot saved to {path}", "data": {"path": path}}
+
+    def _switch_window(self, params):
+        pyautogui.hotkey("alt", "tab")
+        time.sleep(0.3)
+        return {"success": True, "message": "Switched window", "data": {}}
+
+    def _close_window(self, params):
+        pyautogui.hotkey("alt", "f4")
+        return {"success": True, "message": "Closed active window", "data": {}}
+
+    def _open_folder(self, params):
+        path = params.get("path", os.path.expanduser("~"))
+        if platform.system() == "Windows":
+            os.startfile(path)
+        return {"success": True, "message": f"Opened folder {path}", "data": {}}
+
+    def _move_file(self, params):
+        src = params.get("source")
+        dst = params.get("destination")
+        os.replace(src, dst)
+        return {"success": True, "message": f"Moved {src} to {dst}", "data": {}}
+
+    def _rename_file(self, params):
+        src = params.get("path")
+        new_name = params.get("new_name")
+        dst = os.path.join(os.path.dirname(src), new_name)
+        os.rename(src, dst)
+        return {"success": True, "message": f"Renamed to {new_name}", "data": {}}
+
+    def _delete_file(self, params):
+        path = params.get("path")
+        if os.path.isdir(path):
+            import shutil
+            shutil.rmtree(path)
+        else:
+            os.remove(path)
+        return {"success": True, "message": f"Deleted {path}", "data": {}}
+
+    def _shutdown(self, params):
+        os.system("shutdown /s /t 5")
+        return {"success": True, "message": "Shutting down in 5 seconds", "data": {}}
+
+    def _restart(self, params):
+        os.system("shutdown /r /t 5")
+        return {"success": True, "message": "Restarting in 5 seconds", "data": {}}
+
+    def _lock(self, params):
+        os.system("rundll32.exe user32.dll,LockWorkStation")
+        return {"success": True, "message": "Locked workstation", "data": {}}
+
+    def _sleep(self, params):
+        os.system("rundll32.exe powrprof.dll,SetSuspendState 0,1,0")
+        return {"success": True, "message": "Entering sleep mode", "data": {}}

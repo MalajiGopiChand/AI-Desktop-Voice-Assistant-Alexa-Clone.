@@ -1,95 +1,128 @@
 """
 Speech Module.
-This module handles all audio input (listening) and output (speaking).
-It uses SpeechRecognition to understand microphone input and pyttsx3 to speak text.
+Handles audio input (listening) and output (speaking).
+Fixed threading: Uses a queue and a background worker for pyttsx3 to avoid crashes.
 """
 
 import speech_recognition as sr
 import pyttsx3
 import threading
-from config import VOICE_RATE, VOICE_VOLUME, VOICE_INDEX, LISTEN_TIMEOUT, PHRASE_TIME_LIMIT
+import queue
+import time
+from config import VOICE_RATE, VOICE_VOLUME, LISTEN_TIMEOUT, PHRASE_TIME_LIMIT
+from database import get_setting
 
-# Initialize the text-to-speech engine
-# pyttsx3 works offline and uses the system's built-in voices.
-engine = pyttsx3.init()
+def set_widget_state(state):
+    try:
+        with open("widget_state.txt", "w") as f:
+            f.write(state)
+    except:
+        pass
 
-def setup_voice():
-    """
-    Configures the voice engine settings based on config.py.
-    """
-    engine.setProperty('rate', VOICE_RATE)
-    engine.setProperty('volume', VOICE_VOLUME)
-    
-    # Get available voices and set to the configured index (usually 1 is female, 0 is male)
+# We use a Queue to pass text to the TTS engine safely.
+tts_queue = queue.Queue()
+interrupt_flag = False
+engine_ref = None
+
+def onWord(name, location, length):
+    global interrupt_flag, engine_ref
+    if interrupt_flag and engine_ref:
+        engine_ref.stop()
+        interrupt_flag = False
+
+def get_available_voices():
+    """Returns a list of available system voices."""
+    engine = pyttsx3.init()
     voices = engine.getProperty('voices')
-    if len(voices) > VOICE_INDEX:
-        engine.setProperty('voice', voices[VOICE_INDEX].id)
+    return [{"id": i, "name": v.name} for i, v in enumerate(voices)]
 
-# Apply settings immediately
-setup_voice()
+def _tts_worker():
+    """
+    Dedicated background thread for pyttsx3.
+    """
+    global engine_ref
+    engine_ref = pyttsx3.init()
+    engine_ref.connect('word', onWord)
+    
+    # Configure fixed properties
+    engine_ref.setProperty('rate', VOICE_RATE)
+    engine_ref.setProperty('volume', VOICE_VOLUME)
+        
+    while True:
+        text = tts_queue.get()
+        if text is None:
+            break
+            
+        v_idx = int(get_setting("voice_index", 1))
+        voices = engine_ref.getProperty('voices')
+        if len(voices) > v_idx:
+            engine_ref.setProperty('voice', voices[v_idx].id)
+            
+        print(f"Assistant: {text}")
+        try:
+            set_widget_state("speaking")
+            engine_ref.say(text)
+            engine_ref.runAndWait()
+            set_widget_state("idle")
+        except Exception as e:
+            print(f"TTS Error: {e}")
+        tts_queue.task_done()
 
-def _speak_sync(text):
-    """
-    Synchronous speaking function. 
-    This blocks the program until it finishes speaking.
-    We usually call this inside a thread so it doesn't freeze the assistant.
-    """
-    engine.say(text)
-    engine.runAndWait()
+# Start the TTS worker thread immediately
+worker_thread = threading.Thread(target=_tts_worker, daemon=True)
+worker_thread.start()
 
 def speak(text):
     """
     Speaks the given text out loud.
-    Runs on a separate thread so that the assistant doesn't freeze
-    and can do other things while speaking.
-    
-    Args:
-        text (str): The text to be spoken.
+    Adds text to the queue to be processed by the worker thread.
     """
-    print(f"Assistant: {text}")
-    # Create a new thread targeting the synchronous speak function
-    thread = threading.Thread(target=_speak_sync, args=(text,))
-    thread.daemon = True  # Allows the thread to close when the main program closes
-    thread.start()
+    tts_queue.put(text)
+
+def stop_speaking():
+    """Stops current speech and clears the queue."""
+    global interrupt_flag
+    interrupt_flag = True
+    with tts_queue.mutex:
+        tts_queue.queue.clear()
 
 def listen():
     """
     Listens to the microphone and converts speech to text.
-    
-    Returns:
-        str: The recognized text in lowercase, or an empty string if nothing was heard/understood.
+    Handles internet connection errors gracefully.
     """
     recognizer = sr.Recognizer()
     
     with sr.Microphone() as source:
-        print("Listening...")
-        
-        # Adjust for ambient noise to improve recognition accuracy
+        print("Listening...", flush=True)
+        set_widget_state("listening")
         recognizer.adjust_for_ambient_noise(source, duration=0.5)
         
         try:
-            # Listen to the user with a timeout so it doesn't hang forever
             audio = recognizer.listen(source, timeout=LISTEN_TIMEOUT, phrase_time_limit=PHRASE_TIME_LIMIT)
             print("Processing...")
-            
-            # Use Google's free online speech recognition
             query = recognizer.recognize_google(audio)
             print(f"User said: {query}")
             return query.lower()
             
         except sr.WaitTimeoutError:
-            # Reached LISTEN_TIMEOUT without hearing anything
+            set_widget_state("idle")
             return ""
         except sr.UnknownValueError:
-            # Heard something, but couldn't understand the words
             print("Sorry, I didn't catch that.")
+            set_widget_state("idle")
             return ""
         except sr.RequestError as e:
-            # Internet issue or Google API error
-            print(f"Could not request results; check your internet connection. Error: {e}")
-            speak("I am having trouble connecting to the internet.")
+            # Handle [WinError 10053] and connection issues quietly
+            if "10053" in str(e) or "11001" in str(e) or "getaddrinfo" in str(e) or "aborted" in str(e):
+                print("Connection lost or aborted. Retrying quietly...")
+                time.sleep(1)
+            else:
+                print(f"Internet Error: {e}")
             return ""
         except Exception as e:
-            # Catch any other unexpected errors
-            print(f"Error during listening: {e}")
+            if "10053" in str(e) or "aborted" in str(e):
+                time.sleep(1)
+            else:
+                print(f"Error during listening: {e}")
             return ""

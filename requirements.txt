@@ -1,9 +1,37 @@
+# Core (required)
 SpeechRecognition
 pyttsx3
 pyautogui
 psutil
 PyAudio
-wikipedia
 requests
 keyboard
 pillow
+flask
+duckduckgo-search
+groq
+beautifulsoup4
+wikipedia
+
+# Browser automation (recommended)
+playwright
+
+# Vision OCR (optional — install Tesseract separately)
+pytesseract
+
+# Office documents (optional)
+python-docx
+openpyxl
+python-pptx
+pdfplumber
+
+# Analytics & math (optional)
+pandas
+matplotlib
+numpy
+sympy
+
+# Google Calendar (optional)
+google-auth
+google-auth-oauthlib
+google-api-python-client

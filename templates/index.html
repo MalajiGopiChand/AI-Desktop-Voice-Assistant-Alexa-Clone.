@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jarvis Web Interface</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2>Jarvis AI</h2>
+            </div>
+            
+            <div class="sidebar-nav">
+                <button class="nav-btn active" onclick="switchTab('chat')">
+                    <i class="fas fa-comment"></i> Chat
+                </button>
+                <button class="nav-btn" onclick="switchTab('training')">
+                    <i class="fas fa-brain"></i> Train AI
+                </button>
+                <button class="nav-btn" onclick="switchTab('settings')">
+                    <i class="fas fa-cog"></i> Settings
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            
+            <!-- Chat View -->
+            <div id="view-chat" class="view-section active">
+                <div class="chat-container" id="chat-box">
+                    <!-- Chat bubbles injected here -->
+                    <div class="welcome-message">
+                        <h1>How can I help you today?</h1>
+                    </div>
+                </div>
+                
+                <div class="input-container">
+                    <div class="input-box">
+                        <input type="text" id="command-input" placeholder="Message Jarvis..." autocomplete="off">
+                        <button class="send-btn" onclick="sendCommand()">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </div>
+                    <p class="disclaimer">Jarvis can automate your desktop and answer questions. Voice is also active.</p>
+                </div>
+            </div>
+
+            <!-- Training View -->
+            <div id="view-training" class="view-section hidden">
+                <div class="settings-container">
+                    <h1>Train Custom Commands</h1>
+                    <p class="subtitle">Teach Jarvis new tricks. E.g., when you say "open project", it can open VS Code.</p>
+                    
+                    <div class="form-group">
+                        <label>When I say:</label>
+                        <input type="text" id="train-trigger" class="modern-input" placeholder="e.g. open my project">
+                    </div>
+                    <div class="form-group">
+                        <label>Do this action:</label>
+                        <select id="train-action" class="modern-select">
+                            <option value="speak">Speak a phrase</option>
+                            <option value="open">Open an Application</option>
+                            <option value="url">Open a Website</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Action Value:</label>
+                        <input type="text" id="train-value" class="modern-input" placeholder="e.g. vscode, or 'Hello sir'">
+                    </div>
+                    <button class="primary-btn" onclick="trainCommand()">Teach AI</button>
+                    <div id="train-msg" class="msg-box"></div>
+                </div>
+            </div>
+
+            <!-- Settings View -->
+            <div id="view-settings" class="view-section hidden">
+                <div class="settings-container">
+                    <h1>Settings</h1>
+                    
+                    <div class="settings-card">
+                        <h3>Groq API Integration</h3>
+                        <p>Enter your Groq API key (gsk_...) to enable Jarvis's super-intelligent brain.</p>
+                        <div class="form-group">
+                            <input type="password" id="grok-api-key" class="modern-input" placeholder="gsk_...">
+                            <small id="grok-status" style="color: #10a37f; margin-top:5px; display:block;"></small>
+                        </div>
+                        <button class="primary-btn" onclick="saveGrokKey()">Save API Key</button>
+                    </div>
+
+                    <div class="settings-card" style="margin-top: 30px;">
+                        <h3>Weather & News</h3>
+                        <p>OpenWeatherMap key for weather. NewsAPI optional (RSS works without key).</p>
+                        <div class="form-group">
+                            <input type="password" id="weather-key" class="modern-input" placeholder="OpenWeatherMap API key">
+                            <input type="password" id="news-key" class="modern-input" placeholder="NewsAPI key (optional)" style="margin-top:8px">
+                            <input type="text" id="user-city" class="modern-input" placeholder="Your city (e.g. Mumbai)" style="margin-top:8px">
+                        </div>
+                        <button class="primary-btn" onclick="saveExtraKeys()">Save</button>
+                        <small id="extra-keys-status" style="color:#10a37f;display:block;margin-top:8px"></small>
+                    </div>
+
+                    <div class="settings-card" style="margin-top: 30px;">
+                        <h3>Google Calendar</h3>
+                        <p>Place <code>credentials.json</code> in project root, then run:<br>
+                        <code>python scripts/auth_google_calendar.py</code></p>
+                        <small id="calendar-status" style="color:#10a37f;display:block;margin-top:8px"></small>
+                    </div>
+
+                    <div class="settings-card" style="margin-top: 30px;">
+                        <h3>Active Agents</h3>
+                        <p id="agents-list">Loading...</p>
+                        <h4 style="margin-top:15px">Frequently Used Commands</h4>
+                        <p id="frequent-cmds">Loading...</p>
+                    </div>
+
+                    <div class="settings-card" style="margin-top: 30px;">
+                        <h3>Assistant Voice</h3>
+                        <p>Change the Text-to-Speech voice.</p>
+                        <div class="form-group">
+                            <select id="voice-select" class="modern-select" onchange="changeVoice()">
+                                <option value="">Loading voices...</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <script>
+        // Navigation
+        function switchTab(tabId) {
+            document.querySelectorAll('.view-section').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
+            
+            document.getElementById('view-' + tabId).classList.remove('hidden');
+            document.getElementById('view-' + tabId).classList.add('active');
+            event.currentTarget.classList.add('active');
+        }
+
+        // Chat
+        async function fetchHistory() {
+            const res = await fetch('/api/history');
+            const data = await res.json();
+            const box = document.getElementById('chat-box');
+            
+            if(data.length === 0) return;
+            
+            // Reverse so oldest is at top
+            const reversed = data.reverse();
+            
+            box.innerHTML = reversed.map(item => `
+                <div class="chat-message user">
+                    <div class="avatar"><i class="fas fa-user"></i></div>
+                    <div class="message-content">${item.command}</div>
+                </div>
+                <div class="chat-message ai">
+                    <div class="avatar"><i class="fas fa-robot"></i></div>
+                    <div class="message-content">${item.status}</div>
+                </div>
+            `).join('');
+            
+            // Auto scroll
+            box.scrollTop = box.scrollHeight;
+        }
+
+        async function sendCommand() {
+            const input = document.getElementById('command-input');
+            const cmd = input.value.trim();
+            if(!cmd) return;
+            input.value = '';
+            
+            // Optimistic UI update
+            const box = document.getElementById('chat-box');
+            box.innerHTML += `
+                <div class="chat-message user">
+                    <div class="avatar"><i class="fas fa-user"></i></div>
+                    <div class="message-content">${cmd}</div>
+                </div>
+                <div class="chat-message ai" id="loading-msg">
+                    <div class="avatar"><i class="fas fa-robot"></i></div>
+                    <div class="message-content"><i class="fas fa-circle-notch fa-spin"></i> Processing...</div>
+                </div>
+            `;
+            box.scrollTop = box.scrollHeight;
+
+            await fetch('/api/command', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({command: cmd})
+            });
+            fetchHistory();
+        }
+
+        document.getElementById('command-input').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') sendCommand();
+        });
+
+        // Voices
+        async function fetchVoices() {
+            const res = await fetch('/api/voices');
+            const data = await res.json();
+            const select = document.getElementById('voice-select');
+            select.innerHTML = data.voices.map(v => `
+                <option value="${v.id}" ${v.id === data.current ? 'selected' : ''}>${v.name}</option>
+            `).join('');
+        }
+
+        async function changeVoice() {
+            const voiceId = document.getElementById('voice-select').value;
+            await fetch('/api/settings/voice', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({voice_index: parseInt(voiceId)})
+            });
+        }
+
+        // Training
+        async function trainCommand() {
+            const trigger = document.getElementById('train-trigger').value;
+            const action_type = document.getElementById('train-action').value;
+            const action_value = document.getElementById('train-value').value;
+            const msg = document.getElementById('train-msg');
+            
+            const res = await fetch('/api/train', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({trigger, action_type, action_value})
+            });
+            const data = await res.json();
+            
+            msg.innerText = data.message;
+            msg.style.color = data.status === 'success' ? '#10a37f' : '#ef4444';
+            
+            if(data.status === 'success') {
+                document.getElementById('train-trigger').value = '';
+                document.getElementById('train-value').value = '';
+            }
+        }
+
+        // Groq API
+        async function fetchGrokStatus() {
+            const res = await fetch('/api/settings/grok');
+            const data = await res.json();
+            if (data.has_key) {
+                document.getElementById('grok-status').innerText = `Current Key: ${data.api_key_masked}`;
+            }
+        }
+
+        async function saveGrokKey() {
+            const key = document.getElementById('grok-api-key').value.trim();
+            if(!key) return;
+            const res = await fetch('/api/settings/grok', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({api_key: key})
+            });
+            if(res.ok) {
+                document.getElementById('grok-status').innerText = 'Key saved successfully!';
+                document.getElementById('grok-api-key').value = '';
+                setTimeout(fetchGrokStatus, 2000);
+            }
+        }
+
+        async function saveExtraKeys() {
+            const res = await fetch('/api/settings/keys', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    openweather_api_key: document.getElementById('weather-key').value.trim(),
+                    news_api_key: document.getElementById('news-key').value.trim(),
+                    user_city: document.getElementById('user-city').value.trim()
+                })
+            });
+            if(res.ok) document.getElementById('extra-keys-status').innerText = 'Saved!';
+        }
+
+        async function fetchAllSettings() {
+            const res = await fetch('/api/settings/keys');
+            const data = await res.json();
+            if(data.user_city) document.getElementById('user-city').value = data.user_city;
+            document.getElementById('calendar-status').innerText = data.calendar_configured
+                ? 'Calendar connected.' : 'Calendar not configured yet.';
+            document.getElementById('agents-list').innerText = (data.agents || []).join(', ');
+            const freq = data.frequent_commands || [];
+            document.getElementById('frequent-cmds').innerText = freq.length
+                ? freq.map(f => f.command + ' (' + f.count + 'x)').join(', ')
+                : 'No data yet.';
+        }
+
+        // Initialization
+        fetchHistory();
+        fetchVoices();
+        fetchGrokStatus();
+        fetchAllSettings();
+        
+        // Refresh history periodically without disrupting the scroll too much
+        setInterval(() => {
+            const box = document.getElementById('chat-box');
+            // Only auto-fetch if we are near the bottom
+            const isScrolledToBottom = box.scrollHeight - box.clientHeight <= box.scrollTop + 50;
+            if(isScrolledToBottom && document.getElementById('view-chat').classList.contains('active')) {
+                fetchHistory();
+            }
+        }, 3000);
+
+    </script>
+</body>
+</html>

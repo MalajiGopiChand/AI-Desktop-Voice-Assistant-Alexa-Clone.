@@ -1,0 +1,19 @@
+# Credentials & Local Environment
+.env
+*.db
+credentials.json
+token.json
+widget_state.txt
+
+# Python Cache & Build
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# User Outputs & Captures
+screenshots/*.png
+reports/*.docx
+charts/*.png
+vision_capture_*.png
+screenshot_*.png
