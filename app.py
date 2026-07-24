@@ -150,6 +150,44 @@ def manage_api_keys():
     return jsonify(result)
 
 
+@app.route("/api/mobile/status", methods=["GET"])
+def mobile_status():
+    from services.mobile_service import mobile_service
+    return jsonify(mobile_service.get_device_status())
+
+
+@app.route("/api/mobile/action", methods=["POST"])
+def mobile_action():
+    from services.mobile_service import mobile_service
+    data = request.json or {}
+    action = data.get("action")
+    if action == "call":
+        res = mobile_service.make_call(data.get("contact", "Contact"))
+    elif action == "sms":
+        res = mobile_service.send_sms(data.get("contact", ""), data.get("message", ""))
+    elif action == "alarm":
+        res = mobile_service.set_alarm(data.get("time", "07:00 AM"), data.get("label", "Alarm"))
+    elif action == "notifications":
+        res = mobile_service.read_notifications()
+    elif action == "open_app":
+        res = mobile_service.open_mobile_app(data.get("app_name", ""))
+    else:
+        res = {"success": False, "message": f"Unknown mobile action: {action}"}
+    return jsonify(res)
+
+
+@app.route("/api/smart_chat/enhance", methods=["POST"])
+def smart_chat_enhance():
+    from services.mobile_service import mobile_service
+    data = request.json or {}
+    text = (data.get("text") or "").strip()
+    style = data.get("style", "professional")
+    if not text:
+        return jsonify({"success": False, "message": "No text provided"})
+    res = mobile_service.enhance_smart_chat(text, style)
+    return jsonify(res)
+
+
 @app.route("/api/agents", methods=["GET"])
 def list_agents():
     return jsonify({"agents": list(processor.agents.keys())})

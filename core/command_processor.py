@@ -23,6 +23,7 @@ from agents.math_agent import MathAgent
 from agents.file_agent import FileAgent
 from agents.media_agent import MediaAgent
 from agents.info_agent import InfoAgent
+from agents.mobile_agent import MobileAgent
 
 
 class CommandProcessor:
@@ -43,6 +44,7 @@ class CommandProcessor:
             "file_agent": FileAgent(),
             "media_agent": MediaAgent(),
             "info_agent": InfoAgent(),
+            "mobile_agent": MobileAgent(),
         }
         self._last_result_data = {}
         self._pending_confirmation = None
@@ -268,6 +270,21 @@ class CommandProcessor:
         if command in ("hello", "hello metis", "hi", "hi metis", "hey metis", "good morning", "good afternoon", "good evening", "good night", "metis online", "metis", "hello jarvis", "jarvis"):
             from utils import get_time_greeting
             return get_time_greeting("Gopi")
+
+        # Mobile Android Controls
+        if command.startswith("call ") or command.startswith("make call "):
+            contact = command.replace("make call ", "").replace("call ", "").strip()
+            r = self.agents["mobile_agent"].execute("make_call", {"contact": contact})
+            return r.get("message", f"Calling {contact}")
+        if "set alarm" in command or "alarm for" in command:
+            r = self.agents["mobile_agent"].execute("set_alarm", {"time": command})
+            return r.get("message", "Alarm set.")
+        if "read notifications" in command or "mobile notifications" in command:
+            r = self.agents["mobile_agent"].execute("read_notifications", {})
+            return r.get("message", "Notifications summarized.")
+        if "mobile status" in command or "phone status" in command:
+            r = self.agents["mobile_agent"].execute("device_status", {})
+            return r.get("message", "Device status retrieved.")
 
         if (command.startswith("click on ") or command.startswith("click ")) and len(command.split()) > 1:
             target = command.replace("click on ", "").replace("click ", "").strip()

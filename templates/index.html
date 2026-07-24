@@ -34,6 +34,12 @@
                 <button class="nav-item active" data-tab="chat" onclick="switchTab('chat')">
                     <i class="fas fa-comments"></i> <span>Chat & Automation</span>
                 </button>
+                <button class="nav-item" data-tab="mobile" onclick="switchTab('mobile')">
+                    <i class="fas fa-mobile-screen-button"></i> <span>Android Ecosystem</span>
+                </button>
+                <button class="nav-item" data-tab="smartchat" onclick="switchTab('smartchat')">
+                    <i class="fas fa-pen-nib"></i> <span>Smart Chat Assistant</span>
+                </button>
                 <button class="nav-item" data-tab="commands" onclick="switchTab('commands')">
                     <i class="fas fa-terminal"></i> <span>Command Cheat-Sheet</span>
                 </button>
@@ -361,6 +367,99 @@
                 </div>
             </section>
 
+            <!-- VIEW 6: ANDROID ECOSYSTEM & MOBILE COMPANION -->
+            <section id="view-mobile" class="view-panel hidden">
+                <div class="content-container">
+                    <div class="panel-header">
+                        <h1><i class="fas fa-mobile-screen-button"></i> Android Ecosystem & Mobile Companion</h1>
+                        <p class="panel-subtitle">Manage phone calls, SMS drafts, alarms, installed apps, and Notification Intelligence.</p>
+                    </div>
+
+                    <div class="cards-grid">
+                        <div class="card-box">
+                            <h3><i class="fas fa-phone"></i> Make Phone Call</h3>
+                            <div class="form-field">
+                                <label>Contact Name / Number:</label>
+                                <input type="text" id="mobile-call-target" class="glass-input" placeholder="e.g. Rahul">
+                            </div>
+                            <button class="action-btn primary-btn" onclick="executeMobileAction('call')">
+                                <i class="fas fa-phone-flip"></i> Initiate Call
+                            </button>
+                        </div>
+
+                        <div class="card-box">
+                            <h3><i class="fas fa-clock"></i> Set Alarm</h3>
+                            <div class="form-field">
+                                <label>Alarm Time:</label>
+                                <input type="text" id="mobile-alarm-time" class="glass-input" placeholder="e.g. 06:30 AM">
+                            </div>
+                            <button class="action-btn primary-btn" onclick="executeMobileAction('alarm')">
+                                <i class="fas fa-bell"></i> Set Alarm
+                            </button>
+                        </div>
+
+                        <div class="card-box full-width">
+                            <h3><i class="fas fa-message"></i> Send SMS Message</h3>
+                            <div class="form-field">
+                                <label>Contact / Recipient:</label>
+                                <input type="text" id="mobile-sms-contact" class="glass-input" placeholder="e.g. Rahul">
+                            </div>
+                            <div class="form-field">
+                                <label>SMS Message Body:</label>
+                                <input type="text" id="mobile-sms-text" class="glass-input" placeholder="e.g. I'm on my way!">
+                            </div>
+                            <button class="action-btn primary-btn" onclick="executeMobileAction('sms')">
+                                <i class="fas fa-paper-plane"></i> Draft SMS
+                            </button>
+                        </div>
+
+                        <div class="card-box full-width">
+                            <h3><i class="fas fa-bell-concierge"></i> Notification Intelligence</h3>
+                            <p class="card-desc">Categorize, summarize, and prioritize mobile alerts.</p>
+                            <button class="action-btn secondary-btn" onclick="executeMobileAction('notifications')">
+                                <i class="fas fa-eye"></i> Read & Summarize Notifications
+                            </button>
+                            <div id="notifications-output" class="bubble-content" style="margin-top:15px; font-size:0.9rem;"></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- VIEW 7: SMART CHAT ASSISTANT -->
+            <section id="view-smartchat" class="view-panel hidden">
+                <div class="content-container">
+                    <div class="panel-header">
+                        <h1><i class="fas fa-pen-nib"></i> Smart Chat Assistant</h1>
+                        <p class="panel-subtitle">Enhance your message text with grammar correction, professional rephrasing, or concise rewrites.</p>
+                    </div>
+
+                    <div class="card-box full-width">
+                        <div class="form-field">
+                            <label>Draft Message Text:</label>
+                            <textarea id="smart-chat-input" class="glass-input" rows="3" placeholder="Type your raw draft message here..."></textarea>
+                        </div>
+                        <div class="form-field">
+                            <label>Enhancement Tone / Style:</label>
+                            <select id="smart-chat-style" class="glass-select">
+                                <option value="professional">Professional & Corporate</option>
+                                <option value="grammar">Grammar & Spelling Correction</option>
+                                <option value="friendly">Friendly & Casual</option>
+                                <option value="concise">Short & Concise</option>
+                                <option value="formal">Formal & Polite</option>
+                            </select>
+                        </div>
+                        <button class="action-btn primary-btn" onclick="enhanceSmartChat()">
+                            <i class="fas fa-wand-magic-sparkles"></i> Enhance Text
+                        </button>
+
+                        <div style="margin-top:20px;">
+                            <strong>Enhanced Suggestion:</strong>
+                            <div id="smart-chat-output" class="bubble-content" style="background:#23252d; padding:16px; border-radius:8px; margin-top:8px;"></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
         </main>
     </div>
 
@@ -657,6 +756,48 @@
             };
 
             rec.start();
+        }
+
+        async function executeMobileAction(action) {
+            let payload = { action: action };
+            if (action === 'call') {
+                payload.contact = document.getElementById('mobile-call-target').value.trim();
+            } else if (action === 'alarm') {
+                payload.time = document.getElementById('mobile-alarm-time').value.trim();
+            } else if (action === 'sms') {
+                payload.contact = document.getElementById('mobile-sms-contact').value.trim();
+                payload.message = document.getElementById('mobile-sms-text').value.trim();
+            }
+
+            const res = await fetch('/api/mobile/action', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            const data = await res.json();
+            if (action === 'notifications') {
+                document.getElementById('notifications-output').innerText = data.summary || data.message;
+            } else {
+                alert(data.message);
+            }
+        }
+
+        async function enhanceSmartChat() {
+            const text = document.getElementById('smart-chat-input').value.trim();
+            const style = document.getElementById('smart-chat-style').value;
+            const outputDiv = document.getElementById('smart-chat-output');
+            if (!text) {
+                alert('Please enter some text to enhance.');
+                return;
+            }
+            outputDiv.innerText = 'Enhancing text...';
+            const res = await fetch('/api/smart_chat/enhance', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ text: text, style: style })
+            });
+            const data = await res.json();
+            outputDiv.innerText = data.enhanced || data.message;
         }
 
         // Init
