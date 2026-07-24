@@ -19,29 +19,30 @@ def get_groq_api_key():
     from database import get_setting
     from config import GROQ_API_KEY
 
-    key = (
-        os.environ.get("GROQ_API_KEY")
-        or get_setting("groq_api_key")
-        or get_setting("grok_api_key")
-        or GROQ_API_KEY
-    )
-    if not key or key in ("YOUR_GROQ_API_KEY_HERE", ""):
-        return None
-    return key
+    env_key = os.environ.get("GROQ_API_KEY")
+    if env_key and len(env_key) > 20 and env_key.startswith("gsk_"):
+        return env_key
+
+    db_key = get_setting("groq_api_key") or get_setting("grok_api_key")
+    if db_key and len(db_key) > 20 and db_key.startswith("gsk_"):
+        return db_key
+
+    return GROQ_API_KEY if GROQ_API_KEY and len(GROQ_API_KEY) > 20 else None
 
 
 def get_mistral_api_key():
     from database import get_setting
     from config import MISTRAL_API_KEY
 
-    key = (
-        os.environ.get("MISTRAL_API_KEY")
-        or get_setting("mistral_api_key")
-        or MISTRAL_API_KEY
-    )
-    if not key or key in ("YOUR_MISTRAL_API_KEY_HERE", ""):
-        return None
-    return key
+    env_key = os.environ.get("MISTRAL_API_KEY")
+    if env_key and len(env_key) > 15:
+        return env_key
+
+    db_key = get_setting("mistral_api_key")
+    if db_key and len(db_key) > 15:
+        return db_key
+
+    return MISTRAL_API_KEY if MISTRAL_API_KEY and len(MISTRAL_API_KEY) > 15 else None
 
 
 def get_api_key():

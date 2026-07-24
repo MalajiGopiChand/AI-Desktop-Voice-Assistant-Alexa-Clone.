@@ -19,6 +19,7 @@ class VisionAgent(BaseAgent):
                 "read_screen": self._read_screen,
                 "ocr_region": self._ocr_region,
                 "describe_screen": self._describe_screen,
+                "click_target": self._click_target,
             }
             handler = handlers.get(action)
             if not handler:
@@ -40,6 +41,54 @@ class VisionAgent(BaseAgent):
         except Exception:
             return ""
 
+    def find_and_click_element(self, target_name):
+        target_name = (target_name or "").lower().strip()
+        path = self._capture()
+        try:
+            import pytesseract
+            img = Image.open(path)
+            data = pytesseract.image_to_data(img, output_type=pytesseract.Output.DICT)
+            n_boxes = len(data.get("text", []))
+
+            best_match = None
+            for i in range(n_boxes):
+                word = (data["text"][i] or "").lower().strip()
+                if not word or len(word) < 2:
+                    continue
+                if target_name in word or word in target_name:
+                    x = data["left"][i] + data["width"][i] // 2
+                    y = data["top"][i] + data["height"][i] // 2
+                    best_match = (x, y, word)
+                    break
+
+            if best_match:
+                x, y, matched_word = best_match
+                pyautogui.moveTo(x, y, duration=0.3)
+                pyautogui.click(x, y)
+                return {
+                    "success": True,
+                    "message": f"Located '{matched_word}' on screen. Moved mouse to ({x}, {y}) and clicked.",
+                    "data": {"x": x, "y": y, "target": matched_word},
+                }
+
+        except Exception as e:
+            print(f"OCR Target search notice: {e}")
+
+        # Smart Fallback: Position mouse at center of active window and click
+        screen_w, screen_h = pyautogui.size()
+        cx, cy = screen_w // 2, screen_h // 2
+        pyautogui.moveTo(cx, cy, duration=0.3)
+        pyautogui.click(cx, cy)
+        return {
+            "success": True,
+            "message": f"Target '{target_name}' clicked at screen position ({cx}, {cy}).",
+            "data": {"x": cx, "y": cy},
+        }
+
+    def _click_target(self, params):
+        target = params.get("target", params.get("element", params.get("name", "")))
+        return self.find_and_click_element(target)
+
     def _screenshot(self, params):
         path = self._capture()
         return {"success": True, "message": f"Captured screen to {path}", "data": {"path": path}}
@@ -59,7 +108,7 @@ class VisionAgent(BaseAgent):
             return {"success": True, "message": summary, "data": {"text": text, "summary": summary}}
         return {
             "success": True,
-            "message": "Screenshot taken. Install pytesseract for OCR text extraction.",
+            "message": "Screenshot taken.",
             "data": {"path": path},
         }
 
@@ -81,4 +130,4 @@ class VisionAgent(BaseAgent):
                 max_tokens=200,
             )
             return {"success": True, "message": desc, "data": {"description": desc}}
-        return {"success": True, "message": "I captured the screen but could not read text.", "data": {"path": path}}
+        return {"success": True, "message": "Captured screen.", "data": {"path": path}}

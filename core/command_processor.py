@@ -269,6 +269,12 @@ class CommandProcessor:
             from utils import get_time_greeting
             return get_time_greeting("Gopi")
 
+        if (command.startswith("click on ") or command.startswith("click ")) and len(command.split()) > 1:
+            target = command.replace("click on ", "").replace("click ", "").strip()
+            if target not in ("left", "right", "double", "here", "mouse"):
+                res = self.agents["vision_agent"].execute("click_target", {"target": target})
+                return res.get("message", f"Clicked on {target}")
+
         if "time" in command and len(command.split()) <= 4:
             return get_time()
         if ("date" in command or "day is it" in command) and len(command.split()) <= 6:

@@ -65,6 +65,7 @@ class DesktopAgent(BaseAgent):
                 "lock": self._lock,
                 "sleep": self._sleep,
                 "click": self._click,
+                "click_target": self._click_target,
                 "move_mouse": self._move_mouse,
                 "scroll": self._scroll,
             }
@@ -84,6 +85,12 @@ class DesktopAgent(BaseAgent):
         else:
             pyautogui.click()
         return {"success": True, "message": f"Executed {button} click", "data": {}}
+
+    def _click_target(self, params):
+        target = params.get("target", params.get("name", params.get("element", "")))
+        from agents.vision_agent import VisionAgent
+        v = VisionAgent()
+        return v.find_and_click_element(target)
 
     def _move_mouse(self, params):
         direction = params.get("direction", "down").lower()
