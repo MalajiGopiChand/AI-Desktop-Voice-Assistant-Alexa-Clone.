@@ -423,6 +423,45 @@
                             </button>
                         </div>
 
+                        <div class="card-box">
+                            <h3><i class="fab fa-whatsapp"></i> WhatsApp Automation</h3>
+                            <div class="form-field">
+                                <label>Contact Name:</label>
+                                <input type="text" id="mobile-wa-contact" class="glass-input" placeholder="e.g. John">
+                            </div>
+                            <div class="form-field">
+                                <label>Message Text:</label>
+                                <input type="text" id="mobile-wa-text" class="glass-input" placeholder="e.g. Meeting at 5 PM">
+                            </div>
+                            <button class="action-btn primary-btn" onclick="executeMobileAction('whatsapp')">
+                                <i class="fab fa-whatsapp"></i> Draft WhatsApp
+                            </button>
+                        </div>
+
+                        <div class="card-box">
+                            <h3><i class="fas fa-lightbulb"></i> Flashlight & System Controls</h3>
+                            <p class="card-desc">Control mobile torch light and settings.</p>
+                            <div style="display:flex; gap:10px; margin-top:10px;">
+                                <button class="action-btn primary-btn" style="flex:1;" onclick="executeMobileAction('flashlight', 'on')">
+                                    <i class="fas fa-bolt"></i> Torch On
+                                </button>
+                                <button class="action-btn secondary-btn" style="flex:1;" onclick="executeMobileAction('flashlight', 'off')">
+                                    <i class="fas fa-power-off"></i> Torch Off
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="card-box full-width">
+                            <h3><i class="fas fa-border-all"></i> Installed App Launcher</h3>
+                            <div class="form-field">
+                                <label>App Name / Package:</label>
+                                <input type="text" id="mobile-app-name" class="glass-input" placeholder="e.g. Spotify, YouTube, Chrome, Instagram">
+                            </div>
+                            <button class="action-btn primary-btn" onclick="executeMobileAction('open_app')">
+                                <i class="fas fa-rocket"></i> Launch Mobile App
+                            </button>
+                        </div>
+
                         <div class="card-box full-width">
                             <h3><i class="fas fa-bell-concierge"></i> Notification Intelligence</h3>
                             <p class="card-desc">Categorize, summarize, and prioritize mobile alerts.</p>
@@ -434,6 +473,7 @@
                     </div>
                 </div>
             </section>
+
 
             <!-- VIEW 7: SMART CHAT ASSISTANT -->
             <section id="view-smartchat" class="view-panel hidden">
@@ -804,7 +844,7 @@
             rec.start();
         }
 
-        async function executeMobileAction(action) {
+        async function executeMobileAction(action, extraState) {
             let payload = { action: action };
             if (action === 'call') {
                 payload.contact = document.getElementById('mobile-call-target').value.trim();
@@ -813,6 +853,13 @@
             } else if (action === 'sms') {
                 payload.contact = document.getElementById('mobile-sms-contact').value.trim();
                 payload.message = document.getElementById('mobile-sms-text').value.trim();
+            } else if (action === 'whatsapp') {
+                payload.contact = document.getElementById('mobile-wa-contact').value.trim();
+                payload.message = document.getElementById('mobile-wa-text').value.trim();
+            } else if (action === 'flashlight') {
+                payload.state = extraState || 'on';
+            } else if (action === 'open_app') {
+                payload.app_name = document.getElementById('mobile-app-name').value.trim();
             }
 
             const res = await fetch('/api/mobile/action', {
@@ -827,6 +874,7 @@
                 alert(data.message);
             }
         }
+
 
         async function enhanceSmartChat() {
             const text = document.getElementById('smart-chat-input').value.trim();
@@ -1011,5 +1059,16 @@
 
         window.addEventListener('load', checkMobilePermissions);
     </script>
+    <!-- PWA Service Worker Registration & Mobile Install Setup -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/static/sw.js')
+                    .then(reg => console.log('METIS AI PWA Service Worker Registered:', reg.scope))
+                    .catch(err => console.error('PWA Service Worker Registration Failed:', err));
+            });
+        }
+    </script>
 </body>
 </html>
+

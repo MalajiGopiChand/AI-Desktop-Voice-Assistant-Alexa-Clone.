@@ -1,0 +1,9 @@
+<resources>
+    <color name="bg_dark">#0b0f19</color>
+    <color name="accent_emerald">#10a37f</color>
+    <color name="accent_blue">#3b82f6</color>
+    <color name="accent_purple">#8b5cf6</color>
+    <color name="card_dark">#161b26</color>
+    <color name="text_white">#ffffff</color>
+    <color name="text_muted">#64748b</color>
+</resources>

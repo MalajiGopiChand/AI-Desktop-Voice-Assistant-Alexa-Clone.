@@ -49,20 +49,28 @@ def handle_command():
             lower = lower.replace(wake, "", 1).strip(" ,.")
             break
 
-    def web_confirm(prompt):
-        return bool(data.get("confirm", False))
+    structured = processor.process_structured(lower, model=model)
+    return jsonify(structured)
 
-    response = processor.process(
-        lower,
-        confirm_callback=web_confirm,
-        speak_callback=speak,
-        model=model,
-    )
 
-    if response:
-        speak(response)
+@app.route("/api/sync/memory", methods=["GET", "POST"])
+def sync_memory():
+    from core.memory import memory
+    if request.method == "POST":
+        data = request.json or {}
+        cat = data.get("category", "General")
+        fact = data.get("fact", "")
+        if fact:
+            memory.remember_fact(cat, fact)
+            return jsonify({"status": "success", "message": "Fact synced"})
+    return jsonify({"status": "success", "facts": memory.get_all_facts()})
 
-    return jsonify({"response": response, "status": "success"})
+
+@app.route("/api/sync/tasks", methods=["GET", "POST"])
+def sync_tasks():
+    from database import get_history
+    return jsonify({"status": "success", "recent_tasks": get_history(limit=10)})
+
 
 
 @app.route("/api/train", methods=["POST"])
@@ -214,15 +222,22 @@ def mobile_action():
         res = mobile_service.make_call(data.get("contact", "Contact"))
     elif action == "sms":
         res = mobile_service.send_sms(data.get("contact", ""), data.get("message", ""))
+    elif action == "whatsapp":
+        res = mobile_service.send_whatsapp(data.get("contact", ""), data.get("message", ""))
     elif action == "alarm":
         res = mobile_service.set_alarm(data.get("time", "07:00 AM"), data.get("label", "Alarm"))
+    elif action == "flashlight":
+        res = mobile_service.toggle_flashlight(data.get("state", "on"))
     elif action == "notifications":
         res = mobile_service.read_notifications()
     elif action == "open_app":
         res = mobile_service.open_mobile_app(data.get("app_name", ""))
+    elif action == "setting":
+        res = mobile_service.toggle_setting(data.get("setting", "wifi"), data.get("state", "toggle"))
     else:
         res = {"success": False, "message": f"Unknown mobile action: {action}"}
     return jsonify(res)
+
 
 
 @app.route("/api/smart_chat/enhance", methods=["POST"])

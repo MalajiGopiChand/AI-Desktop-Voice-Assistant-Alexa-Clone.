@@ -57,6 +57,30 @@ class MobileService:
             "app": app_name
         }
 
+    def toggle_flashlight(self, state="on"):
+        return {
+            "success": True,
+            "message": f"Flashlight turned {state} on Android mobile device.",
+            "state": state
+        }
+
+    def send_whatsapp(self, contact, message):
+        return {
+            "success": True,
+            "message": f"Drafted WhatsApp message for {contact}: '{message}'. Confirmation required before sending.",
+            "contact": contact,
+            "message": message
+        }
+
+    def toggle_setting(self, setting_name, state="toggle"):
+        return {
+            "success": True,
+            "message": f"Mobile setting '{setting_name}' set to {state}.",
+            "setting": setting_name,
+            "state": state
+        }
+
+
     def read_notifications(self):
         sample_notifications = [
             {"sender": "WhatsApp (Rahul)", "text": "Are we meeting at 4 PM today?", "time": "10:15 AM", "category": "Message"},

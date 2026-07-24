@@ -1,5 +1,5 @@
-// Service Worker for METIS AI OS Mobile PWA & Background Sync
-const CACHE_NAME = 'metis-ai-v1';
+// Service Worker for METIS AI Mobile Web PWA
+const CACHE_NAME = 'metis-mobile-pwa-v2';
 const urlsToCache = [
   '/',
   '/static/style.css',
@@ -27,9 +27,8 @@ self.addEventListener('fetch', (event) => {
   );
 });
 
-// Background Push & Notification Listener
 self.addEventListener('push', (event) => {
-  const data = event.data ? event.data.json() : { title: 'Metis AI Alert', body: 'New notification' };
+  const data = event.data ? event.data.json() : { title: 'METIS AI Mobile Alert', body: 'New notification from Metis' };
   event.waitUntil(
     self.registration.showNotification(data.title, {
       body: data.body,

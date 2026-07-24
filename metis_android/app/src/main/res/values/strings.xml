@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">METIS AI</string>
+    <string name="accessibility_description">METIS AI Mobile Operating System Assistant uses Accessibility Services to automate app actions (e.g. drafting WhatsApp messages, tapping buttons) per user voice requests.</string>
+</resources>

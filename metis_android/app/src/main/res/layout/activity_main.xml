@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#0b0f19"
+    android:padding="20dp">
+
+    <!-- Top Visor View HUD -->
+    <com.metis.agent.visor.VisorView
+        android:id="@+id/visorView"
+        android:layout_width="match_parent"
+        android:layout_height="220dp"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="24dp" />
+
+    <!-- Status Feed -->
+    <TextView
+        android:id="@+id/tvStatus"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/visorView"
+        android:layout_marginTop="16dp"
+        android:textColor="#10a37f"
+        android:textSize="16sp"
+        android:gravity="center"
+        android:text="METIS AI OS Active — Say 'Hey Metis'" />
+
+    <!-- Bottom Input Controls -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:orientation="horizontal">
+
+        <EditText
+            android:id="@+id/etCommand"
+            android:layout_width="0dp"
+            android:layout_height="50dp"
+            android:layout_weight="1"
+            android:background="#161b26"
+            android:hint="Type voice command..."
+            android:textColor="#ffffff"
+            android:textColorHint="#64748b"
+            android:paddingHorizontal="16dp" />
+
+        <Button
+            android:id="@+id/btnMic"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_marginStart="8dp"
+            android:backgroundTint="#8b5cf6"
+            android:text="🎤" />
+
+        <Button
+            android:id="@+id/btnSend"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_marginStart="8dp"
+            android:backgroundTint="#10a37f"
+            android:text="➔" />
+
+    </LinearLayout>
+
+</RelativeLayout>

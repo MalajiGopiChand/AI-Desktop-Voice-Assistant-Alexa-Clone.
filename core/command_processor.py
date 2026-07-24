@@ -366,5 +366,100 @@ class CommandProcessor:
             return r.get("message", f"Searched for {query}.")
         return None
 
+    def process_structured(self, command, model=None, device_context=None):
+        """Returns structured dict with target ('mobile'/'desktop'), agent, action, params, and spoken_reply."""
+        raw_cmd = (command or "").strip().lower()
+        if not raw_cmd:
+            return {"status": "error", "message": "Empty command"}
+
+        # Mobile control direct intent mapping
+        if raw_cmd.startswith(("call ", "make call ", "dial ")):
+            contact = raw_cmd.replace("make call ", "").replace("call ", "").replace("dial ", "").strip()
+            return {
+                "status": "success",
+                "target": "mobile",
+                "agent": "DeviceControlAgent",
+                "action": "make_call",
+                "params": {"contact": contact},
+                "spoken_reply": f"Calling {contact}.",
+                "confirmation_required": True
+            }
+
+        if any(p in raw_cmd for p in ("whatsapp message", "send whatsapp", "send whatsapp message")):
+            parts = raw_cmd.split("to ", 1)[-1] if "to " in raw_cmd else raw_cmd
+            contact = parts.split()[0] if parts else "Contact"
+            msg = raw_cmd.split("message", 1)[-1].strip(" :") if "message" in raw_cmd else "Hello"
+            return {
+                "status": "success",
+                "target": "mobile",
+                "agent": "CommsAgent",
+                "action": "send_whatsapp",
+                "params": {"contact": contact, "message": msg},
+                "spoken_reply": f"Drafting WhatsApp message to {contact}: {msg}",
+                "confirmation_required": True
+            }
+
+        if any(p in raw_cmd for p in ("send sms", "send text", "text message")):
+            parts = raw_cmd.split("to ", 1)[-1] if "to " in raw_cmd else raw_cmd
+            contact = parts.split()[0] if parts else "Contact"
+            msg = raw_cmd.split("text", 1)[-1].strip(" :") if "text" in raw_cmd else "Hello"
+            return {
+                "status": "success",
+                "target": "mobile",
+                "agent": "CommsAgent",
+                "action": "send_sms",
+                "params": {"contact": contact, "message": msg},
+                "spoken_reply": f"Sending SMS to {contact}.",
+                "confirmation_required": True
+            }
+
+        if "set alarm" in raw_cmd or "alarm for" in raw_cmd:
+            return {
+                "status": "success",
+                "target": "mobile",
+                "agent": "DeviceControlAgent",
+                "action": "set_alarm",
+                "params": {"time": raw_cmd},
+                "spoken_reply": "Setting alarm on your phone.",
+                "confirmation_required": False
+            }
+
+        if any(w in raw_cmd for w in ("flashlight", "torch")):
+            toggle = "off" if "off" in raw_cmd else "on"
+            return {
+                "status": "success",
+                "target": "mobile",
+                "agent": "DeviceControlAgent",
+                "action": "toggle_flashlight",
+                "params": {"state": toggle},
+                "spoken_reply": f"Turning flashlight {toggle}.",
+                "confirmation_required": False
+            }
+
+        if "read notifications" in raw_cmd or "summarize notifications" in raw_cmd:
+            return {
+                "status": "success",
+                "target": "mobile",
+                "agent": "NotificationAgent",
+                "action": "read_notifications",
+                "params": {},
+                "spoken_reply": "Summarizing your recent notifications.",
+                "confirmation_required": False
+            }
+
+        # Fallback to standard process pipeline
+        text_response = self.process(command, model=model)
+        return {
+            "status": "success",
+            "target": "general",
+            "agent": "ResearchAgent",
+            "action": "speak",
+            "params": {"text": text_response},
+            "spoken_reply": text_response[:290] if text_response else "Request complete.",
+            "response": text_response,
+            "confirmation_required": False
+        }
+
 
 processor = CommandProcessor()
+
