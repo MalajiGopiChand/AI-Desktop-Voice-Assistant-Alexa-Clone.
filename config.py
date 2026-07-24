@@ -2,8 +2,12 @@
 METIS AI Operating System — Configuration
 """
 import os
+import tempfile
 
 _ROOT = os.path.dirname(os.path.abspath(__file__))
+IS_VERCEL = os.environ.get("VERCEL") == "1" or bool(os.environ.get("VERCEL_ENV"))
+IS_CLOUD_RUNTIME = IS_VERCEL or os.environ.get("METIS_CLOUD_MODE", "false").lower() == "true"
+_RUNTIME_DIR = tempfile.gettempdir() if IS_CLOUD_RUNTIME else _ROOT
 
 
 def _load_env_file():
@@ -55,11 +59,17 @@ LISTEN_TIMEOUT = 5
 PHRASE_TIME_LIMIT = 12
 
 # Storage
-DATABASE_PATH = "database/assistant.db"
-MEMORY_DB_PATH = "metis_memory.db"
-SCREENSHOTS_DIR = "screenshots"
-REPORTS_DIR = "reports"
-CHARTS_DIR = "charts"
+DATABASE_PATH = os.environ.get(
+    "DATABASE_PATH",
+    os.path.join(_RUNTIME_DIR, "assistant.db") if IS_CLOUD_RUNTIME else "database/assistant.db",
+)
+MEMORY_DB_PATH = os.environ.get(
+    "MEMORY_DB_PATH",
+    os.path.join(_RUNTIME_DIR, "metis_memory.db") if IS_CLOUD_RUNTIME else "metis_memory.db",
+)
+SCREENSHOTS_DIR = os.path.join(_RUNTIME_DIR, "screenshots") if IS_CLOUD_RUNTIME else "screenshots"
+REPORTS_DIR = os.path.join(_RUNTIME_DIR, "reports") if IS_CLOUD_RUNTIME else "reports"
+CHARTS_DIR = os.path.join(_RUNTIME_DIR, "charts") if IS_CLOUD_RUNTIME else "charts"
 
 # Browser
 DEFAULT_BROWSER = "chrome"
@@ -87,8 +97,9 @@ GOOGLE_CALENDAR_SCOPES = [
 
 GROK_API_KEY = GROQ_API_KEY
 
-for _dir in (SCREENSHOTS_DIR, REPORTS_DIR, CHARTS_DIR, "database"):
-    os.makedirs(_dir, exist_ok=True)
+for _dir in (SCREENSHOTS_DIR, REPORTS_DIR, CHARTS_DIR, os.path.dirname(DATABASE_PATH)):
+    if _dir:
+        os.makedirs(_dir, exist_ok=True)
 
 # After database path exists, pull saved keys
 _load_keys_from_database()

@@ -8,11 +8,21 @@ import time
 import webbrowser
 import subprocess
 import psutil
-import pyautogui
-pyautogui.FAILSAFE = False
 import wikipedia
 import datetime
 import platform
+
+try:
+    import pyautogui
+    pyautogui.FAILSAFE = False
+except Exception:
+    pyautogui = None
+
+
+def _require_desktop_automation():
+    if pyautogui is None:
+        raise RuntimeError("Desktop automation is unavailable in this cloud environment.")
+    return pyautogui
 
 def system_info():
     cpu_usage = psutil.cpu_percent(interval=0.5)
@@ -69,10 +79,12 @@ def open_app(app_name):
             subprocess.Popen("mspaint.exe")
             return "Opening Paint."
         elif "task manager" in app_name:
-            pyautogui.hotkey('ctrl', 'shift', 'esc')
+            gui = _require_desktop_automation()
+            gui.hotkey('ctrl', 'shift', 'esc')
             return "Opening Task Manager."
         elif "file explorer" in app_name or "my computer" in app_name:
-            pyautogui.hotkey('win', 'e')
+            gui = _require_desktop_automation()
+            gui.hotkey('win', 'e')
             return "Opening File Explorer."
         elif "browser" in app_name:
             webbrowser.open("http://www.google.com")
@@ -85,11 +97,12 @@ def open_app(app_name):
             return "Opening VS Code."
         else:
             # Fallback to searching the start menu using pyautogui
-            pyautogui.press('win')
+            gui = _require_desktop_automation()
+            gui.press('win')
             time.sleep(1.5) # Give start menu time to open
-            pyautogui.write(app_name, interval=0.1)
+            gui.write(app_name, interval=0.1)
             time.sleep(1.5) # Give search time to find the app
-            pyautogui.press('enter')
+            gui.press('enter')
             return f"Trying to open {app_name} from the start menu."
     except Exception as e:
         print(f"Failed to open app {app_name}: {e}")
@@ -136,28 +149,29 @@ def open_website(url_name):
 def automate_task(task):
     task = task.lower()
     try:
+        gui = _require_desktop_automation()
         if "screenshot" in task:
-            screenshot = pyautogui.screenshot()
+            screenshot = gui.screenshot()
             file_name = f"screenshot_{int(time.time())}.png"
             screenshot.save(file_name)
             return f"Screenshot saved."
         elif "volume up" in task or "increase volume" in task:
-            for _ in range(5): pyautogui.press('volumeup')
+            for _ in range(5): gui.press('volumeup')
             return "Volume increased."
         elif "volume down" in task or "decrease volume" in task:
-            for _ in range(5): pyautogui.press('volumedown')
+            for _ in range(5): gui.press('volumedown')
             return "Volume decreased."
         elif "mute" in task:
-            pyautogui.press('volumemute')
+            gui.press('volumemute')
             return "Muted system volume."
         elif "copy" in task:
-            pyautogui.hotkey('ctrl', 'c')
+            gui.hotkey('ctrl', 'c')
             return "Copied to clipboard."
         elif "paste" in task:
-            pyautogui.hotkey('ctrl', 'v')
+            gui.hotkey('ctrl', 'v')
             return "Pasted from clipboard."
         elif "select all" in task:
-            pyautogui.hotkey('ctrl', 'a')
+            gui.hotkey('ctrl', 'a')
             return "Selected all text."
         elif "play" in task or "pause" in task:
             import keyboard
@@ -177,10 +191,10 @@ def automate_task(task):
             keyboard.write(text_to_type, delay=0.05)
             return f"Typed: {text_to_type}"
         elif "press enter" in task or "hit enter" in task:
-            pyautogui.press('enter')
+            gui.press('enter')
             return "Pressed Enter."
         elif "press escape" in task:
-            pyautogui.press('esc')
+            gui.press('esc')
             return "Pressed Escape."
         else:
             return "I don't know how to automate that task yet."

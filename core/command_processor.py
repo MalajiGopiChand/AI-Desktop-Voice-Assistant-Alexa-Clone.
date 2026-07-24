@@ -1,6 +1,9 @@
 """
 Unified command processor — single pipeline for voice, web UI, and API.
 """
+import importlib
+
+from config import IS_CLOUD_RUNTIME
 from core.memory import memory
 from core.brain import brain
 from core.planner import planner
@@ -8,44 +11,65 @@ from core.learning import learning
 from core.safety import requires_confirmation, build_confirmation_prompt
 from database import get_custom_commands, save_history
 
-from agents.desktop_agent import DesktopAgent
-from agents.browser_agent import BrowserAgent
-from agents.research_agent import ResearchAgent
-from agents.vision_agent import VisionAgent
-from agents.comms_agent import CommsAgent
-from agents.coding_agent import CodingAgent
-from agents.automation_agent import AutomationAgent
-from agents.conversation_agent import ConversationAgent
-from agents.calendar_agent import CalendarAgent
-from agents.office_agent import OfficeAgent
-from agents.analytics_agent import AnalyticsAgent
-from agents.math_agent import MathAgent
-from agents.file_agent import FileAgent
-from agents.media_agent import MediaAgent
-from agents.info_agent import InfoAgent
-from agents.mobile_agent import MobileAgent
+AGENT_CLASSES = {
+    "desktop_agent": ("agents.desktop_agent", "DesktopAgent"),
+    "browser_agent": ("agents.browser_agent", "BrowserAgent"),
+    "research_agent": ("agents.research_agent", "ResearchAgent"),
+    "vision_agent": ("agents.vision_agent", "VisionAgent"),
+    "comms_agent": ("agents.comms_agent", "CommsAgent"),
+    "coding_agent": ("agents.coding_agent", "CodingAgent"),
+    "automation_agent": ("agents.automation_agent", "AutomationAgent"),
+    "conversation_agent": ("agents.conversation_agent", "ConversationAgent"),
+    "calendar_agent": ("agents.calendar_agent", "CalendarAgent"),
+    "office_agent": ("agents.office_agent", "OfficeAgent"),
+    "analytics_agent": ("agents.analytics_agent", "AnalyticsAgent"),
+    "math_agent": ("agents.math_agent", "MathAgent"),
+    "file_agent": ("agents.file_agent", "FileAgent"),
+    "media_agent": ("agents.media_agent", "MediaAgent"),
+    "info_agent": ("agents.info_agent", "InfoAgent"),
+    "mobile_agent": ("agents.mobile_agent", "MobileAgent"),
+}
+
+CLOUD_DISABLED_AGENTS = {
+    "desktop_agent",
+    "vision_agent",
+    "comms_agent",
+    "automation_agent",
+    "media_agent",
+}
+
+
+class UnavailableAgent:
+    def __init__(self, name, reason):
+        self.name = name
+        self.reason = reason
+
+    def execute(self, action, params):
+        return {
+            "success": False,
+            "message": f"{self.name} cannot run '{action}' here. {self.reason}",
+            "data": {},
+        }
+
+
+def _load_agent(agent_name):
+    if IS_CLOUD_RUNTIME and agent_name in CLOUD_DISABLED_AGENTS:
+        return UnavailableAgent(
+            agent_name,
+            "Desktop automation is available only in the local desktop app, not on Vercel.",
+        )
+
+    module_name, class_name = AGENT_CLASSES[agent_name]
+    try:
+        module = importlib.import_module(module_name)
+        return getattr(module, class_name)()
+    except Exception as exc:
+        return UnavailableAgent(agent_name, f"Import failed: {exc}")
 
 
 class CommandProcessor:
     def __init__(self):
-        self.agents = {
-            "desktop_agent": DesktopAgent(),
-            "browser_agent": BrowserAgent(),
-            "research_agent": ResearchAgent(),
-            "vision_agent": VisionAgent(),
-            "comms_agent": CommsAgent(),
-            "coding_agent": CodingAgent(),
-            "automation_agent": AutomationAgent(),
-            "conversation_agent": ConversationAgent(),
-            "calendar_agent": CalendarAgent(),
-            "office_agent": OfficeAgent(),
-            "analytics_agent": AnalyticsAgent(),
-            "math_agent": MathAgent(),
-            "file_agent": FileAgent(),
-            "media_agent": MediaAgent(),
-            "info_agent": InfoAgent(),
-            "mobile_agent": MobileAgent(),
-        }
+        self.agents = {name: _load_agent(name) for name in AGENT_CLASSES}
         self._last_result_data = {}
         self._pending_confirmation = None
 

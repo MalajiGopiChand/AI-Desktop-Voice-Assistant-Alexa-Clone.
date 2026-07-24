@@ -41,7 +41,9 @@ def get_connection():
         return mysql_conn, "mysql"
 
     # SQLite Fallback
-    os.makedirs(os.path.dirname(DATABASE_PATH), exist_ok=True)
+    db_dir = os.path.dirname(DATABASE_PATH)
+    if db_dir:
+        os.makedirs(db_dir, exist_ok=True)
     return sqlite3.connect(DATABASE_PATH), "sqlite"
 
 
@@ -179,7 +181,7 @@ def fetch_recent_errors(limit=5):
         conn, db_type = get_connection()
         cursor = conn.cursor()
         ph = "%s" if db_type == "mysql" else "?"
-        cursor.execute(f"SELECT module_source, error_message, timestamp FROM ErrorLogs ORDER BY id DESC LIMIT {ph}", (limit,))
+        cursor.execute(f"SELECT module, error_message, timestamp FROM ErrorLogs ORDER BY id DESC LIMIT {ph}", (limit,))
         rows = cursor.fetchall()
         conn.close()
         return [{"source": r[0], "message": r[1], "timestamp": str(r[2])} for r in rows]

@@ -2,10 +2,14 @@ import sqlite3
 import os
 import json
 from datetime import datetime
+from config import MEMORY_DB_PATH
 
 class MemorySystem:
-    def __init__(self, db_path="jarvis_memory.db"):
-        self.db_path = db_path
+    def __init__(self, db_path=None):
+        self.db_path = db_path or MEMORY_DB_PATH
+        db_dir = os.path.dirname(self.db_path)
+        if db_dir:
+            os.makedirs(db_dir, exist_ok=True)
         self.conn = sqlite3.connect(self.db_path, check_same_thread=False)
         self.cursor = self.conn.cursor()
         self.init_db()

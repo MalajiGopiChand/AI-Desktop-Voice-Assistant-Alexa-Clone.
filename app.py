@@ -1,5 +1,12 @@
 from flask import Flask, render_template, request, jsonify
-from database import get_history, add_custom_command, save_history, set_setting, get_setting
+from database import (
+    add_custom_command,
+    create_tables,
+    get_history,
+    get_setting,
+    save_history,
+    set_setting,
+)
 from core.command_processor import processor
 from speech import speak, get_available_voices
 from core.llm_client import get_groq_api_key, get_mistral_api_key
@@ -10,6 +17,11 @@ app = Flask(__name__)
 
 os.makedirs("templates", exist_ok=True)
 os.makedirs("static", exist_ok=True)
+
+try:
+    create_tables()
+except Exception as exc:
+    print(f"Database initialization notice: {exc}")
 
 
 @app.route("/")
