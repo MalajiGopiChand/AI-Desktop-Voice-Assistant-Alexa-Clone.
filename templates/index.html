@@ -626,10 +626,12 @@
                     body: JSON.stringify({ command: cmd, model: currentModel })
                 });
                 const data = await res.json();
+                const textResp = data.response || "Executed.";
                 const el = document.getElementById(tempId);
                 if (el) {
-                    el.querySelector('.bubble-content').innerHTML = formatMarkdown(data.response || "Executed.");
+                    el.querySelector('.bubble-content').innerHTML = formatMarkdown(textResp);
                 }
+                speakWebResponse(textResp);
                 fetchHistory();
             } catch (err) {
                 const el = document.getElementById(tempId);
@@ -749,6 +751,27 @@
             document.getElementById('frequent-cmds').innerHTML = freq.length
                 ? freq.map(f => `<span class="badge">${f.command} (${f.count}x)</span>`).join(' ')
                 : 'No command history recorded yet.';
+        }
+
+        function speakWebResponse(text) {
+            if (!text || !('speechSynthesis' in window)) return;
+            try {
+                window.speechSynthesis.cancel();
+                const cleanText = text.replace(/<[^>]*>/g, '').replace(/[*_#`]/g, '').trim();
+                if (!cleanText) return;
+                const utterance = new SpeechSynthesisUtterance(cleanText.substring(0, 300));
+                utterance.rate = 1.0;
+                utterance.pitch = 1.0;
+
+                const visor = document.getElementById('mobile-robot-visor');
+                if (visor) visor.innerText = 'METIS [ 💬 ‿ 💬 ]';
+
+                utterance.onend = function() {
+                    if (visor) visor.innerText = 'METIS [ ⊙ ‿ ⊙ ]';
+                };
+
+                window.speechSynthesis.speak(utterance);
+            } catch(e) {}
         }
 
         // Web Speech API Microphone Integration

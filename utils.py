@@ -24,22 +24,35 @@ def _require_desktop_automation():
         raise RuntimeError("Desktop automation is unavailable in this cloud environment.")
     return pyautogui
 
+def get_ist_now():
+    try:
+        import zoneinfo
+        tz = zoneinfo.ZoneInfo("Asia/Kolkata")
+        return datetime.datetime.now(tz)
+    except Exception:
+        utc_now = datetime.datetime.now(datetime.timezone.utc)
+        ist_offset = datetime.timezone(datetime.timedelta(hours=5, minutes=30))
+        return utc_now.astimezone(ist_offset)
+
+
 def system_info():
-    cpu_usage = psutil.cpu_percent(interval=0.5)
+    cpu_usage = psutil.cpu_percent(interval=0.2)
     memory_info = psutil.virtual_memory()
     ram_usage = memory_info.percent
-    
+
     battery = psutil.sensors_battery()
     if battery:
         plugged = "plugged in and charging" if battery.power_plugged else "not plugged in"
         battery_status = f"Battery is at {battery.percent} percent and is {plugged}."
     else:
-        battery_status = "Battery information is not available."
+        battery_status = "Battery information is active."
 
-    return f"CPU is at {cpu_usage} percent. RAM usage is at {ram_usage} percent. {battery_status}"
+    return {"cpu_percent": cpu_usage, "ram_percent": ram_usage, "battery_status": battery_status, "text": f"CPU is at {cpu_usage} percent. RAM usage is at {ram_usage} percent. {battery_status}"}
+
 
 def get_time_greeting(name="Gopi"):
-    hour = datetime.datetime.now().hour
+    now = get_ist_now()
+    hour = now.hour
     if 5 <= hour < 12:
         period = "Good morning"
     elif 12 <= hour < 17:
@@ -48,15 +61,17 @@ def get_time_greeting(name="Gopi"):
         period = "Good evening"
     else:
         period = "Good night"
-    return f"{period} Master {name}! I am online and ready to assist you."
+    return f"{period} Master {name}! Metis is online in India Standard Time."
+
 
 def get_time():
-    now = datetime.datetime.now()
-    return f"The current time is {now.strftime('%I:%M %p')}."
+    now = get_ist_now()
+    return f"The current time in India (IST) is {now.strftime('%I:%M %p')}."
+
 
 def get_date():
-    now = datetime.datetime.now()
-    return f"Today is {now.strftime('%B %d, %Y')}."
+    now = get_ist_now()
+    return f"Today is {now.strftime('%A, %B %d, %Y')} (India Standard Time)."
 
 def open_app(app_name):
     app_name = app_name.lower()
