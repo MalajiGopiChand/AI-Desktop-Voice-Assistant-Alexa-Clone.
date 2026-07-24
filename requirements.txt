@@ -10,6 +10,7 @@ pillow
 flask
 duckduckgo-search
 groq
+mistralai
 beautifulsoup4
 wikipedia
 

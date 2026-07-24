@@ -11,7 +11,7 @@ Never store or ask for passwords."""
 
 
 class Brain:
-    def converse(self, user_message):
+    def converse(self, user_message, model=None):
         context = memory.get_context(limit=8)
         facts = memory.recall_facts(limit=10)
         fact_str = "\n".join(f"- {f}" for f in facts) if facts else "None stored yet."
@@ -24,7 +24,7 @@ class Brain:
             messages.append({"role": msg["role"], "content": msg["content"]})
         messages.append({"role": "user", "content": user_message})
 
-        return chat(messages, model=FAST_MODEL, max_tokens=300)
+        return chat(messages, model=model or FAST_MODEL, max_tokens=400)
 
     def classify_intent(self, user_message):
         """Returns 'simple', 'complex', or 'conversation'."""

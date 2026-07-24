@@ -30,10 +30,12 @@ def main():
 
     start_jarvis_thread()
 
-    try:
-        subprocess.Popen([sys.executable, "widget.py"], cwd=ROOT)
-    except Exception as e:
-        print(f"Widget skipped: {e}")
+    from config import SHOW_DESKTOP_WIDGET
+    if SHOW_DESKTOP_WIDGET:
+        try:
+            subprocess.Popen([sys.executable, "widget.py"], cwd=ROOT)
+        except Exception as e:
+            print(f"Widget skipped: {e}")
 
     try:
         app.start_flask()

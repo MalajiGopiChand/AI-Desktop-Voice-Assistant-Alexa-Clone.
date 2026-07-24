@@ -47,7 +47,7 @@ class CommandProcessor:
         self._last_result_data = {}
         self._pending_confirmation = None
 
-    def process(self, command, confirm_callback=None, speak_callback=None):
+    def process(self, command, confirm_callback=None, speak_callback=None, model=None):
         command = (command or "").strip().lower()
         if not command:
             return ""
@@ -82,7 +82,7 @@ class CommandProcessor:
         intent = brain.classify_intent(command)
 
         if intent == "conversation":
-            response = brain.converse(command)
+            response = brain.converse(command, model=model)
             memory.add_context("assistant", response)
             save_history(command, response[:80])
             return response
@@ -90,9 +90,9 @@ class CommandProcessor:
         if speak_callback:
             speak_callback("Processing your request.")
 
-        plan_result = planner.generate_plan(command)
+        plan_result = planner.generate_plan(command, model=model)
         if "error" in plan_result:
-            fallback = brain.converse(command)
+            fallback = brain.converse(command, model=model)
             memory.add_context("assistant", fallback)
             save_history(command, f"Fallback: {fallback[:60]}")
             return fallback

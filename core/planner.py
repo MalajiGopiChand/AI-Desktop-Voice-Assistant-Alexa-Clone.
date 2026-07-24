@@ -43,7 +43,7 @@ conversation_agent: chat(message)
 
 
 class PlannerEngine:
-    def generate_plan(self, user_command):
+    def generate_plan(self, user_command, model=None):
         context_msgs = memory.get_context(limit=6)
         context_str = "\n".join(f"{m['role']}: {m['content']}" for m in context_msgs)
         facts = memory.recall_facts(limit=5)
@@ -75,7 +75,7 @@ Example:
         try:
             raw = chat(
                 [{"role": "system", "content": system_prompt}, {"role": "user", "content": prompt}],
-                model=DEFAULT_MODEL,
+                model=model or DEFAULT_MODEL,
                 max_tokens=1000,
                 temperature=0.1,
             )

@@ -1,8 +1,8 @@
 from flask import Flask, render_template, request, jsonify
 from database import get_history, add_custom_command, save_history, set_setting, get_setting
 from core.command_processor import processor
-from core.voice_engine import voice_engine
 from speech import speak, get_available_voices
+from core.llm_client import get_groq_api_key, get_mistral_api_key
 import os
 
 app = Flask(__name__)
@@ -25,6 +25,8 @@ def history():
 def handle_command():
     data = request.json or {}
     command_text = (data.get("command") or "").strip()
+    model = (data.get("model") or "").strip() or None
+
     if not command_text:
         return jsonify({"status": "error", "message": "No command provided"})
 
@@ -35,13 +37,13 @@ def handle_command():
             break
 
     def web_confirm(prompt):
-        # Web UI auto-approves compose actions; destructive ops need explicit confirm flag
         return bool(data.get("confirm", False))
 
     response = processor.process(
         lower,
         confirm_callback=web_confirm,
         speak_callback=speak,
+        model=model,
     )
 
     if response:
@@ -81,23 +83,47 @@ def update_voice():
     return jsonify({"status": "error"})
 
 
-@app.route("/api/settings/grok", methods=["GET", "POST"])
-def manage_groq_key():
-    from config import GROQ_API_KEY
+@app.route("/api/models", methods=["GET"])
+def list_models():
+    models = [
+        {"id": "llama-3.3-70b-versatile", "name": "Llama 3.3 70B (Groq)", "provider": "Groq", "active": bool(get_groq_api_key())},
+        {"id": "llama-3.1-8b-instant", "name": "Llama 3.1 8B Fast (Groq)", "provider": "Groq", "active": bool(get_groq_api_key())},
+        {"id": "mistral-large-latest", "name": "Mistral Large (Mistral AI)", "provider": "Mistral AI", "active": bool(get_mistral_api_key())},
+        {"id": "mistral-small-latest", "name": "Mistral Small (Mistral AI)", "provider": "Mistral AI", "active": bool(get_mistral_api_key())},
+    ]
+    return jsonify({"models": models})
+
+
+@app.route("/api/settings/llm", methods=["GET", "POST"])
+def manage_llm_keys():
+    from config import GROQ_API_KEY, MISTRAL_API_KEY
 
     if request.method == "POST":
         data = request.json or {}
-        api_key = data.get("api_key")
-        if api_key:
-            set_setting("groq_api_key", api_key)
-            set_setting("grok_api_key", api_key)  # legacy
-            return jsonify({"status": "success"})
-        return jsonify({"status": "error", "message": "No key provided"})
+        if "groq_api_key" in data and data["groq_api_key"]:
+            set_setting("groq_api_key", data["groq_api_key"])
+            set_setting("grok_api_key", data["groq_api_key"])
+            os.environ["GROQ_API_KEY"] = data["groq_api_key"]
+        if "mistral_api_key" in data and data["mistral_api_key"]:
+            set_setting("mistral_api_key", data["mistral_api_key"])
+            os.environ["MISTRAL_API_KEY"] = data["mistral_api_key"]
+        return jsonify({"status": "success"})
 
-    key = get_setting("groq_api_key") or get_setting("grok_api_key") or GROQ_API_KEY
-    display = f"{key[:8]}...{key[-4:]}" if key and len(key) > 12 else ""
-    has_key = bool(key)
-    return jsonify({"api_key_masked": display, "has_key": has_key})
+    groq = get_groq_api_key() or ""
+    mistral = get_mistral_api_key() or ""
+
+    mask = lambda k: f"{k[:8]}...{k[-4:]}" if len(k) > 12 else ""
+    return jsonify({
+        "groq_key_masked": mask(groq),
+        "has_groq": bool(groq),
+        "mistral_key_masked": mask(mistral),
+        "has_mistral": bool(mistral),
+    })
+
+
+@app.route("/api/settings/grok", methods=["GET", "POST"])
+def manage_groq_key():
+    return manage_llm_keys()
 
 
 @app.route("/api/settings/keys", methods=["GET", "POST"])
@@ -138,6 +164,8 @@ def system_status():
         "info": system_info(),
         "agents": len(processor.agents),
         "porcupine": wake_detector.is_offline_available,
+        "groq_active": bool(get_groq_api_key()),
+        "mistral_active": bool(get_mistral_api_key()),
     })
 
 
