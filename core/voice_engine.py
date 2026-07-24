@@ -47,16 +47,24 @@ class VoiceEngine:
                 print(f"TTS Error: {e}")
             self.tts_queue.task_done()
 
-    def set_widget_state(self, state):
+    def set_widget_state(self, state, text=""):
         try:
             with open("widget_state.txt", "w", encoding="utf-8") as f:
                 f.write(state)
+            if text:
+                with open("widget_text.txt", "w", encoding="utf-8") as f:
+                    f.write(text)
         except OSError:
             pass
 
     def speak(self, text, block=False):
         if not text:
             return
+        try:
+            with open("widget_text.txt", "w", encoding="utf-8") as f:
+                f.write(text)
+        except OSError:
+            pass
         self.tts_queue.put(text)
         if block:
             self.tts_queue.join()

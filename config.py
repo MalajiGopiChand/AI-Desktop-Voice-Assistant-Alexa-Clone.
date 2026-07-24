@@ -38,14 +38,14 @@ _load_env_file()
 
 # Identity
 USERNAME = os.environ.get("JARVIS_USERNAME", "Gopi")
-ASSISTANT_NAME = "Jarvis"
+ASSISTANT_NAME = "Metis"
 ASSISTANT_CITY = os.environ.get("JARVIS_CITY", "Mumbai")
 
 # Wake words
-WAKE_WORDS = ["jarvis", "hello jarvis", "hey jarvis"]
+WAKE_WORDS = ["metis", "hello metis", "hey metis", "jarvis", "hello jarvis"]
 REQUIRE_WAKE_WORD = os.environ.get("REQUIRE_WAKE_WORD", "false").lower() == "true"
 USE_PORCUPINE_WAKE_WORD = os.environ.get("USE_PORCUPINE", "false").lower() == "true"
-SHOW_DESKTOP_WIDGET = os.environ.get("SHOW_DESKTOP_WIDGET", "false").lower() == "true"
+SHOW_DESKTOP_WIDGET = os.environ.get("SHOW_DESKTOP_WIDGET", "true").lower() == "true"
 
 # Voice
 VOICE_RATE = 165

@@ -49,7 +49,7 @@ class PlannerEngine:
         facts = memory.recall_facts(limit=5)
         fact_str = "\n".join(f"- {f}" for f in facts) if facts else "None"
 
-        system_prompt = f"""You are the JARVIS AI Planner. Break commands into a sequential JSON execution plan.
+        system_prompt = f"""You are the Metis AI Planner. Break commands into a sequential JSON execution plan.
 
 {AGENT_CATALOG}
 

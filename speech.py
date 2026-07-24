@@ -12,11 +12,14 @@ import time
 from config import VOICE_RATE, VOICE_VOLUME, LISTEN_TIMEOUT, PHRASE_TIME_LIMIT
 from database import get_setting
 
-def set_widget_state(state):
+def set_widget_state(state, text=""):
     try:
-        with open("widget_state.txt", "w") as f:
+        with open("widget_state.txt", "w", encoding="utf-8") as f:
             f.write(state)
-    except:
+        if text:
+            with open("widget_text.txt", "w", encoding="utf-8") as f:
+                f.write(text)
+    except Exception:
         pass
 
 # We use a Queue to pass text to the TTS engine safely.
@@ -85,6 +88,13 @@ def speak(text):
     Speaks the given text out loud.
     Adds text to the queue to be processed by the worker thread.
     """
+    if not text:
+        return
+    try:
+        with open("widget_text.txt", "w", encoding="utf-8") as f:
+            f.write(text)
+    except Exception:
+        pass
     tts_queue.put(text)
 
 def stop_speaking():

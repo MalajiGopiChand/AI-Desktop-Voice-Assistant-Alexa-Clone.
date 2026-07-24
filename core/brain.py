@@ -3,7 +3,7 @@ from core.llm_client import chat, FAST_MODEL
 from core.memory import memory
 
 
-SYSTEM_PROMPT = """You are JARVIS, an intelligent desktop AI operating system.
+SYSTEM_PROMPT = """You are Metis, an intelligent desktop AI operating system.
 You help the user with conversations, reasoning, coding, research, and desktop tasks.
 Be concise — responses may be spoken aloud via text-to-speech.
 When you lack live data, say so honestly.
