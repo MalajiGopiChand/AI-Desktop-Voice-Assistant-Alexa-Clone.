@@ -959,8 +959,15 @@
 
     <script>
         function checkMobilePermissions() {
+            const modal = document.getElementById('mobile-perm-modal');
             if (window.innerWidth <= 900 && !localStorage.getItem('metis_perm_granted')) {
-                document.getElementById('mobile-perm-modal').classList.remove('hidden');
+                if (modal) {
+                    modal.classList.remove('hidden');
+                    modal.style.display = 'flex';
+                }
+            } else if (modal) {
+                modal.classList.add('hidden');
+                modal.style.display = 'none';
             }
         }
 
@@ -971,8 +978,12 @@
                 }
             } catch(e) {}
             localStorage.setItem('metis_perm_granted', 'true');
-            document.getElementById('mobile-perm-modal').classList.add('hidden');
-            alert('Metis Mobile Companion Permissions Activated!');
+            const modal = document.getElementById('mobile-perm-modal');
+            if (modal) {
+                modal.classList.add('hidden');
+                modal.style.display = 'none';
+            }
+            switchTab('chat');
         }
 
         window.addEventListener('load', checkMobilePermissions);
