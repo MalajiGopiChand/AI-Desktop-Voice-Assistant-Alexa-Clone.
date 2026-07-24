@@ -14,7 +14,7 @@ class CalendarAgent(BaseAgent):
                 return {"success": True, "message": msg, "data": {}}
             if action == "create_reminder":
                 ok, msg = create_reminder(
-                    params.get("title", "JARVIS Reminder"),
+                    params.get("title", "Metis Reminder"),
                     int(params.get("minutes", 30)),
                 )
                 return {"success": ok, "message": msg, "data": {}}

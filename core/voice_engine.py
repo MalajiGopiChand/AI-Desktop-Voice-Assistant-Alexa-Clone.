@@ -37,7 +37,10 @@ class VoiceEngine:
                     self.engine_ref.setProperty("voice", voices[1].id)
             except Exception:
                 pass
-            print(f"JARVIS: {text}")
+            try:
+                print(f"Metis: {text}")
+            except Exception:
+                pass
             try:
                 self.set_widget_state("speaking")
                 self.engine_ref.say(text)

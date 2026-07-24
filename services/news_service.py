@@ -19,7 +19,7 @@ def fetch_rss_headlines(limit=5):
     headlines = []
     for source, url in RSS_FEEDS:
         try:
-            resp = requests.get(url, timeout=8, headers={"User-Agent": "JARVIS/1.0"})
+            resp = requests.get(url, timeout=8, headers={"User-Agent": "Metis/1.0"})
             resp.raise_for_status()
             root = ET.fromstring(resp.content)
             count = 0

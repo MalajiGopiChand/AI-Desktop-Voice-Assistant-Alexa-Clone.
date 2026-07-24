@@ -1,5 +1,5 @@
 """
-JARVIS AI Operating System — Configuration
+METIS AI Operating System — Configuration
 """
 import os
 
@@ -37,12 +37,12 @@ def _load_keys_from_database():
 _load_env_file()
 
 # Identity
-USERNAME = os.environ.get("JARVIS_USERNAME", "Gopi")
+USERNAME = os.environ.get("JARVIS_USERNAME", os.environ.get("METIS_USERNAME", "Gopi"))
 ASSISTANT_NAME = "Metis"
-ASSISTANT_CITY = os.environ.get("JARVIS_CITY", "Mumbai")
+ASSISTANT_CITY = os.environ.get("JARVIS_CITY", os.environ.get("METIS_CITY", "Mumbai"))
 
 # Wake words
-WAKE_WORDS = ["metis", "hello metis", "hey metis", "jarvis", "hello jarvis"]
+WAKE_WORDS = ["metis", "hello metis", "hey metis"]
 REQUIRE_WAKE_WORD = os.environ.get("REQUIRE_WAKE_WORD", "false").lower() == "true"
 USE_PORCUPINE_WAKE_WORD = os.environ.get("USE_PORCUPINE", "false").lower() == "true"
 SHOW_DESKTOP_WIDGET = os.environ.get("SHOW_DESKTOP_WIDGET", "true").lower() == "true"
@@ -56,7 +56,7 @@ PHRASE_TIME_LIMIT = 12
 
 # Storage
 DATABASE_PATH = "database/assistant.db"
-MEMORY_DB_PATH = "jarvis_memory.db"
+MEMORY_DB_PATH = "metis_memory.db"
 SCREENSHOTS_DIR = "screenshots"
 REPORTS_DIR = "reports"
 CHARTS_DIR = "charts"

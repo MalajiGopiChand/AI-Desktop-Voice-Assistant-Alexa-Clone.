@@ -224,7 +224,7 @@ if __name__ == "__main__":
     with open(STATE_FILE, "w", encoding="utf-8") as f:
         f.write("idle")
     with open(TEXT_FILE, "w", encoding="utf-8") as f:
-        f.write("JARVIS AI Assistant is active!")
+        f.write("METIS AI Assistant is active!")
 
     root = tk.Tk()
     app = RobotCompanion(root)

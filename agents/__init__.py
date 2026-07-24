@@ -1,1 +1,1 @@
-"""JARVIS specialized agents."""
+"""METIS specialized agents."""

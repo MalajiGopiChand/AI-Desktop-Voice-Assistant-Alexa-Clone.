@@ -1,1 +1,1 @@
-"""JARVIS core modules."""
+"""METIS core modules."""

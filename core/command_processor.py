@@ -48,10 +48,11 @@ class CommandProcessor:
         self._pending_confirmation = None
 
     def process(self, command, confirm_callback=None, speak_callback=None, model=None):
-        command = (command or "").strip().lower()
-        if not command:
+        raw_cmd = (command or "").strip().lower()
+        if not raw_cmd:
             return ""
 
+        command = learning.resolve_semantic_phrase(raw_cmd)
         learning.record(command)
 
         # Auto-learn custom commands
@@ -264,7 +265,7 @@ class CommandProcessor:
                 return "Opening Hotstar in your browser."
 
         # --- Time-Based Greeting Protocols ---
-        if command in ("hello", "hello jarvis", "hi", "hi jarvis", "hey jarvis", "good morning", "good afternoon", "good evening", "good night", "jarvis online", "jarvis"):
+        if command in ("hello", "hello metis", "hi", "hi metis", "hey metis", "good morning", "good afternoon", "good evening", "good night", "metis online", "metis", "hello jarvis", "jarvis"):
             from utils import get_time_greeting
             return get_time_greeting("Gopi")
 

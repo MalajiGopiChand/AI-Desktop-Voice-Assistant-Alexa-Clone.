@@ -1,4 +1,4 @@
-"""JARVIS Orchestrator — voice loop with wake word and multi-agent execution."""
+"""METIS Orchestrator — voice loop with wake word and multi-agent execution."""
 import time
 from core.voice_engine import voice_engine
 from core.command_processor import processor
@@ -15,7 +15,7 @@ class Orchestrator:
         name = memory.get_preference("username", USERNAME)
         mode = "offline Porcupine" if wake_detector.is_offline_available else "voice"
         voice_engine.speak(
-            f"{ASSISTANT_NAME} online. Hello {name}. Wake word mode: {mode}. Say Jarvis to activate."
+            f"{ASSISTANT_NAME} online. Hello {name}. Wake word mode: {mode}. Say Metis to activate."
         )
 
         while self.running:
@@ -30,7 +30,7 @@ class Orchestrator:
                     if not text:
                         continue
                     voice_engine.stop_speaking()
-                    if any(w in text for w in ("exit", "quit", "shutdown jarvis", "sleep mode")):
+                    if any(w in text for w in ("exit", "quit", "shutdown metis", "sleep mode")):
                         voice_engine.speak("Powering down. Goodbye.")
                         break
                     detected, command = wake_detector.check_transcript(text)
@@ -42,7 +42,7 @@ class Orchestrator:
                         if not command:
                             continue
 
-                if any(w in command for w in ("exit", "quit", "shutdown jarvis")):
+                if any(w in command for w in ("exit", "quit", "shutdown metis")):
                     voice_engine.speak("Goodbye.")
                     break
 
@@ -62,10 +62,14 @@ class Orchestrator:
         self.running = False
 
 
-def start_jarvis():
+def start_metis():
     Orchestrator().run()
 
 
-def start_jarvis_thread():
+def start_metis_thread():
     import threading
-    threading.Thread(target=start_jarvis, daemon=True).start()
+    threading.Thread(target=start_metis, daemon=True).start()
+
+
+def start_jarvis_thread():
+    start_metis_thread()

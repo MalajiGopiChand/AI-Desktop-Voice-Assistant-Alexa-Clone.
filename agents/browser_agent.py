@@ -108,7 +108,7 @@ class BrowserAgent(BaseAgent):
             return self._automate_read(params)
         if not url.startswith("http"):
             url = "https://" + url
-        headers = {"User-Agent": "Mozilla/5.0 (JARVIS Bot)"}
+        headers = {"User-Agent": "Mozilla/5.0 (Metis Bot)"}
         resp = requests.get(url, headers=headers, timeout=15)
         resp.raise_for_status()
         soup = BeautifulSoup(resp.text, "html.parser")

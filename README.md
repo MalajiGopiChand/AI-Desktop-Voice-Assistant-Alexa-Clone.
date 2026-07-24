@@ -1,4 +1,4 @@
-# JARVIS AI Operating System — Technical Documentation & User Manual
+# METIS AI Operating System — Technical Documentation & User Manual
 
 A production-ready desktop AI assistant with **15 specialized agents**, voice recognition, vision, Playwright browser automation, Google Calendar, Office documents, data analytics, mathematical engine, and long-term memory.
 

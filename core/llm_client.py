@@ -1,4 +1,4 @@
-"""Shared Multi-Provider LLM Client for JARVIS (Groq + Mistral AI)."""
+"""Shared Multi-Provider LLM Client for METIS (Groq + Mistral AI)."""
 import os
 import sys
 import requests

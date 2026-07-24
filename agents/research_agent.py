@@ -62,7 +62,7 @@ class ResearchAgent(BaseAgent):
         prompt = params.get("prompt", "")
         response = chat(
             [
-                {"role": "system", "content": "You are JARVIS research assistant. Be accurate and concise."},
+                {"role": "system", "content": "You are Metis research assistant. Be accurate and concise."},
                 {"role": "user", "content": prompt},
             ],
             model=FAST_MODEL,

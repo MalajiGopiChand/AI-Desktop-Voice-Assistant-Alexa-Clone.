@@ -10,7 +10,9 @@ pyautogui.FAILSAFE = False
 APP_MAP = {
     "chrome": "chrome",
     "google chrome": "chrome",
+    "browser": "chrome",
     "notepad": "notepad",
+    "note pad": "notepad",
     "calculator": "calc",
     "calc": "calc",
     "paint": "mspaint",
@@ -21,6 +23,10 @@ APP_MAP = {
     "discord": "discord",
     "telegram": "telegram",
     "whatsapp": "whatsapp:",
+    "whats app": "whatsapp:",
+    "what app": "whatsapp:",
+    "watsapp": "whatsapp:",
+    "wtsapp": "whatsapp:",
     "file explorer": "explorer",
     "explorer": "explorer",
     "cmd": "cmd",
@@ -29,6 +35,9 @@ APP_MAP = {
     "word": "winword",
     "excel": "excel",
     "powerpoint": "powerpnt",
+    "copilot": "ms-copilot:",
+    "co pilot": "ms-copilot:",
+    "ko pilot": "ms-copilot:",
 }
 
 
@@ -106,7 +115,9 @@ class DesktopAgent(BaseAgent):
         return next((c for c in candidates if os.path.exists(c)), "chrome")
 
     def _open_app(self, params):
-        app_name = params.get("app_name", "").lower().strip()
+        raw_app = params.get("app_name", "").lower().strip()
+        from core.learning import learning
+        app_name = learning.resolve_semantic_phrase(raw_app)
         profile = params.get("profile", "")
 
         if "chrome" in app_name:
@@ -120,10 +131,10 @@ class DesktopAgent(BaseAgent):
             return {"success": True, "message": msg, "data": {}}
 
         for key, launch in APP_MAP.items():
-            if key in app_name:
+            if key in app_name or app_name in key:
                 if platform.system() == "Windows":
-                    if launch == "whatsapp:":
-                        os.system("start whatsapp:")
+                    if launch.endswith(":"):
+                        os.system(f"start {launch}")
                     elif launch == "explorer":
                         pyautogui.hotkey("win", "e")
                     else:

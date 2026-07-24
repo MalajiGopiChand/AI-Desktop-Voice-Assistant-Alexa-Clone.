@@ -31,7 +31,7 @@ def handle_command():
         return jsonify({"status": "error", "message": "No command provided"})
 
     lower = command_text.lower()
-    for wake in ("jarvis", "hey jarvis", "hello jarvis"):
+    for wake in ("metis", "hey metis", "hello metis"):
         if lower.startswith(wake):
             lower = lower.replace(wake, "", 1).strip(" ,.")
             break
@@ -170,7 +170,7 @@ def system_status():
 
 
 def start_flask():
-    print("JARVIS Web Dashboard: http://localhost:5000")
+    print("METIS Web Dashboard: http://localhost:5000")
     app.run(host="0.0.0.0", port=5000, debug=False, use_reloader=False)
 
 
