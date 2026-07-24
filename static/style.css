@@ -734,14 +734,91 @@ body {
     font-weight: 600;
 }
 
-/* Responsive Media Queries */
+/* Modal Overlay & Mobile Permission Styles */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.75);
+    backdrop-filter: blur(8px);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.modal-card {
+    background: var(--bg-sidebar);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 24px;
+    max-width: 440px;
+    width: 100%;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+}
+
+.modal-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+    color: var(--accent-color);
+    font-size: 1.2rem;
+}
+
+.perm-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin: 15px 0;
+}
+
+.perm-item {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid var(--border-color);
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.perm-item i {
+    color: var(--accent-color);
+}
+
+.mobile-robot-visor {
+    display: none;
+    background: #000;
+    border: 1px solid var(--accent-color);
+    color: var(--accent-color);
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-family: monospace;
+    font-size: 0.8rem;
+    font-weight: bold;
+    box-shadow: 0 0 10px rgba(16, 163, 127, 0.4);
+}
+
+/* Responsive Media Queries for Mobile ChatGPT UI */
 @media (max-width: 900px) {
+    .mobile-robot-visor {
+        display: inline-block;
+    }
+
     .sidebar {
         position: absolute;
         top: 0;
         left: 0;
         height: 100vh;
+        z-index: 1000;
         transform: translateX(-100%);
+        transition: transform 0.3s ease;
     }
 
     .sidebar.open {
@@ -753,14 +830,14 @@ body {
     }
 
     .chat-row {
-        padding: 16px 5%;
+        padding: 12px 4%;
     }
 
     .chat-input-area {
-        padding: 12px 5% 16px;
+        padding: 10px 4% 14px;
     }
 
     .content-container {
-        padding: 20px 5%;
+        padding: 16px 4%;
     }
 }

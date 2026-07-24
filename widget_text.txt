@@ -1,1 +1,1 @@
-OpenWeatherMap API key not configured. Add OPENWEATHER_API_KEY in Settings.
+METIS AI Assistant is active!

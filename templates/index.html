@@ -98,6 +98,7 @@
                 <div class="header-model-indicator">
                     <span id="current-model-label">Llama 3.3 70B</span>
                     <span class="pill-badge" id="active-provider-pill">Groq Cloud</span>
+                    <div class="mobile-robot-visor" id="mobile-robot-visor">METIS [ ⊙ ‿ ⊙ ]</div>
                 </div>
 
                 <div class="header-actions">
@@ -933,6 +934,47 @@
             root.render(<RealTimeMonitor />);
         }
     </script>
-    {% endraw %}
+    <!-- Mobile Permission & Companion Modal -->
+    <div id="mobile-perm-modal" class="modal-overlay hidden">
+        <div class="modal-card">
+            <div class="modal-header">
+                <i class="fas fa-shield-cat"></i>
+                <h2>Metis AI Mobile Companion</h2>
+            </div>
+            <p style="color:#aaa; font-size:0.9rem; margin-bottom:15px;">
+                To enable hands-free voice commands, phone calls, SMS drafting, and alarms on your Android device, please grant permissions:
+            </p>
+            <div class="perm-list">
+                <div class="perm-item"><i class="fas fa-microphone"></i> Microphone & Voice Commands</div>
+                <div class="perm-item"><i class="fas fa-phone"></i> Phone Calls & Contacts Access</div>
+                <div class="perm-item"><i class="fas fa-bell"></i> Notifications & Alert Summarizer</div>
+                <div class="perm-item"><i class="fas fa-location-dot"></i> Location & Device Services</div>
+            </div>
+            <button class="action-btn primary-btn full-width" style="margin-top:15px; width:100%;" onclick="grantMobilePermissions()">
+                <i class="fas fa-check-circle"></i> Grant & Activate Metis Mobile
+            </button>
+        </div>
+    </div>
+
+    <script>
+        function checkMobilePermissions() {
+            if (window.innerWidth <= 900 && !localStorage.getItem('metis_perm_granted')) {
+                document.getElementById('mobile-perm-modal').classList.remove('hidden');
+            }
+        }
+
+        async function grantMobilePermissions() {
+            try {
+                if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                    await navigator.mediaDevices.getUserMedia({ audio: true });
+                }
+            } catch(e) {}
+            localStorage.setItem('metis_perm_granted', 'true');
+            document.getElementById('mobile-perm-modal').classList.add('hidden');
+            alert('Metis Mobile Companion Permissions Activated!');
+        }
+
+        window.addEventListener('load', checkMobilePermissions);
+    </script>
 </body>
 </html>
