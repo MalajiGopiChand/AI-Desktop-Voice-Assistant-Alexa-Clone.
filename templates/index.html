@@ -34,6 +34,9 @@
                 <button class="nav-item active" data-tab="chat" onclick="switchTab('chat')">
                     <i class="fas fa-comments"></i> <span>Chat & Automation</span>
                 </button>
+                <button class="nav-item" data-tab="commands" onclick="switchTab('commands')">
+                    <i class="fas fa-terminal"></i> <span>Command Cheat-Sheet</span>
+                </button>
                 <button class="nav-item" data-tab="apikeys" onclick="switchTab('apikeys')">
                     <i class="fas fa-key"></i> <span>API Keys (Groq / Mistral)</span>
                 </button>
@@ -291,6 +294,68 @@
                                 <strong>Top Frequent Commands:</strong>
                                 <p id="frequent-cmds" class="badge-list">Loading...</p>
                             </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- VIEW 5: COMMAND CHEAT-SHEET & REMOTE DESKTOP CONTROLS -->
+            <section id="view-commands" class="view-panel hidden">
+                <div class="content-container">
+                    <div class="panel-header">
+                        <h1><i class="fas fa-terminal"></i> Voice & Remote Desktop Command Cheat-Sheet</h1>
+                        <p class="panel-subtitle">Full list of supported voice commands, chat reading, email answering, popup handling, and mouse control protocols.</p>
+                    </div>
+
+                    <div class="cards-grid">
+                        <div class="card-box">
+                            <h3><i class="fas fa-mouse-pointer"></i> Voice Mouse & Screen Remote Controls</h3>
+                            <p class="card-desc">Control your desktop cursor and screen directly using your voice or Web UI.</p>
+                            <ul class="command-list">
+                                <li><code>scroll mouse down</code> / <code>scroll down</code> — Scroll active window downwards</li>
+                                <li><code>scroll mouse up</code> / <code>scroll up</code> — Scroll active window upwards</li>
+                                <li><code>move mouse right 150</code> / <code>move mouse left</code> — Move cursor relative position</li>
+                                <li><code>right click</code> — Execute mouse right click at pointer</li>
+                                <li><code>left click</code> — Execute mouse left click at pointer</li>
+                                <li><code>double click</code> — Execute double click</li>
+                                <li><code>press enter</code> / <code>press space</code> / <code>press tab</code> — Key presses</li>
+                            </ul>
+                        </div>
+
+                        <div class="card-box">
+                            <h3><i class="fas fa-comments"></i> Chat Reading & Email Answering</h3>
+                            <p class="card-desc">Metis can read visible chat screen content, draft replies, and explain alert popups.</p>
+                            <ul class="command-list">
+                                <li><code>read chats</code> / <code>read whatsapp</code> — OCR vision reads active chat & summarizes messages</li>
+                                <li><code>send message &lt;text&gt;</code> — Paste text and press Enter in open chat</li>
+                                <li><code>open whatsapp and send message to &lt;contact&gt;: &lt;text&gt;</code> — Auto open chat & message</li>
+                                <li><code>answer email</code> / <code>reply email</code> — Reads open email text & drafts reply</li>
+                                <li><code>explain popup</code> — OCR vision reads active popup alert & explains required action</li>
+                            </ul>
+                        </div>
+
+                        <div class="card-box">
+                            <h3><i class="fas fa-cubes"></i> Application Launcher Shortcuts</h3>
+                            <p class="card-desc">Instant launch aliases for desktop software and web apps.</p>
+                            <ul class="command-list">
+                                <li><code>open copilot</code> / <code>ko pilot</code> — Launch Microsoft Copilot</li>
+                                <li><code>open whatsapp</code> / <code>whats app</code> — Launch WhatsApp Desktop</li>
+                                <li><code>open chrome</code> — Launch Google Chrome</li>
+                                <li><code>open notepad</code> — Launch Windows Notepad</li>
+                                <li><code>open vscode</code> / <code>vs code</code> — Launch Visual Studio Code</li>
+                                <li><code>open excel</code> / <code>word</code> / <code>powerpoint</code> — Launch MS Office</li>
+                            </ul>
+                        </div>
+
+                        <div class="card-box">
+                            <h3><i class="fas fa-film"></i> Media & Video Playback Controls</h3>
+                            <p class="card-desc">Control YouTube and browser video streams with voice.</p>
+                            <ul class="command-list">
+                                <li><code>play pause video</code> / <code>pause</code> — Toggle video play/pause</li>
+                                <li><code>seek forward</code> / <code>seek backward</code> — Skip 10 seconds forward/backward</li>
+                                <li><code>fullscreen video</code> — Toggle full-screen mode</li>
+                                <li><code>search youtube for &lt;query&gt;</code> — Open & play YouTube video</li>
+                            </ul>
                         </div>
                     </div>
                 </div>

@@ -4,6 +4,7 @@ import urllib.parse
 import webbrowser
 import pyautogui
 from agents.base_agent import BaseAgent
+from core.llm_client import chat, FAST_MODEL
 
 pyautogui.FAILSAFE = False
 
@@ -21,6 +22,9 @@ class CommsAgent(BaseAgent):
                 "open_whatsapp": self._open_whatsapp,
                 "send_whatsapp": self._send_whatsapp,
                 "read_whatsapp": self._read_whatsapp,
+                "read_chats": self._read_chats,
+                "answer_email": self._answer_email,
+                "explain_popup": self._explain_popup,
                 "open_chat": self._open_chat,
                 "type_message": self._type_message,
                 "send_message": self._send_message,
@@ -121,9 +125,69 @@ class CommsAgent(BaseAgent):
         return {"success": True, "message": f"Sent message to {contact}", "data": {}}
 
     def _read_whatsapp(self, params):
-        os.system("start whatsapp:")
-        return {
-            "success": True,
-            "message": "WhatsApp is open. Full message reading requires vision OCR.",
-            "data": {},
-        }
+        return self._read_chats(params)
+
+    def _read_chats(self, params):
+        from agents.vision_agent import VisionAgent
+        v = VisionAgent()
+        res = v._read_screen({})
+        text = res.get("data", {}).get("text", "")
+
+        if text:
+            summary = chat(
+                [
+                    {"role": "system", "content": "Extract and summarize recent chat messages visible on screen."},
+                    {"role": "user", "content": text[:4000]},
+                ],
+                model=FAST_MODEL,
+                max_tokens=250,
+            )
+            return {"success": True, "message": f"Chat Summary: {summary}", "data": {"text": text, "summary": summary}}
+        return {"success": True, "message": "Opened active chat window. Please ensure chat window is visible on screen.", "data": {}}
+
+    def _answer_email(self, params):
+        from agents.vision_agent import VisionAgent
+        v = VisionAgent()
+        res = v._read_screen({})
+        text = res.get("data", {}).get("text", "")
+
+        reply_intent = params.get("reply", "Confirm receipt and thank them.")
+
+        if text:
+            reply_text = chat(
+                [
+                    {"role": "system", "content": f"Write a professional email reply based on visible email text. User instruction: {reply_intent}"},
+                    {"role": "user", "content": text[:4000]},
+                ],
+                model=FAST_MODEL,
+                max_tokens=300,
+            )
+
+            # Auto-type reply into current text area
+            try:
+                import pyperclip
+                pyperclip.copy(reply_text)
+                pyautogui.hotkey("ctrl", "v")
+            except Exception:
+                pyautogui.write(reply_text[:100], interval=0.03)
+
+            return {"success": True, "message": f"Drafted email reply: {reply_text[:120]}...", "data": {"reply": reply_text}}
+        return {"success": False, "message": "Could not read open email text on screen.", "data": {}}
+
+    def _explain_popup(self, params):
+        from agents.vision_agent import VisionAgent
+        v = VisionAgent()
+        res = v._read_screen({})
+        text = res.get("data", {}).get("text", "")
+
+        if text:
+            explanation = chat(
+                [
+                    {"role": "system", "content": "Explain what the system alert / popup window on screen says and what action is needed."},
+                    {"role": "user", "content": text[:4000]},
+                ],
+                model=FAST_MODEL,
+                max_tokens=250,
+            )
+            return {"success": True, "message": f"Popup Alert Explanation: {explanation}", "data": {"explanation": explanation}}
+        return {"success": True, "message": "No active popup dialog text detected on screen.", "data": {}}
