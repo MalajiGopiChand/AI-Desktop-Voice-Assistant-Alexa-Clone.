@@ -2,11 +2,14 @@ import os
 import time
 import urllib.parse
 import webbrowser
-import pyautogui
 from agents.base_agent import BaseAgent
 from core.llm_client import chat, FAST_MODEL
 
-pyautogui.FAILSAFE = False
+try:
+    import pyautogui
+    pyautogui.FAILSAFE = False
+except Exception:
+    pyautogui = None
 
 
 class CommsAgent(BaseAgent):

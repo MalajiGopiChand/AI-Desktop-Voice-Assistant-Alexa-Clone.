@@ -1,11 +1,14 @@
 import os
 import time
-import pyautogui
 from PIL import Image
 from agents.base_agent import BaseAgent
 from core.llm_client import chat, FAST_MODEL
 
-pyautogui.FAILSAFE = False
+try:
+    import pyautogui
+    pyautogui.FAILSAFE = False
+except Exception:
+    pyautogui = None
 
 
 class VisionAgent(BaseAgent):

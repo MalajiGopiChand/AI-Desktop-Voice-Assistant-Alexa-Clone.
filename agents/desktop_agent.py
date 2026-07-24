@@ -2,10 +2,13 @@ import os
 import time
 import platform
 import subprocess
-import pyautogui
 from agents.base_agent import BaseAgent
 
-pyautogui.FAILSAFE = False
+try:
+    import pyautogui
+    pyautogui.FAILSAFE = False
+except Exception:
+    pyautogui = None
 
 APP_MAP = {
     "chrome": "chrome",
