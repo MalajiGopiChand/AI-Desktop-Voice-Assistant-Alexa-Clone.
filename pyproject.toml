@@ -1,0 +1,29 @@
+[project]
+name = "app"
+version = "0.1.0"
+description = "Metis AI OS — Cross-Platform Desktop & Mobile AI Assistant"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "speechrecognition",
+    "requests",
+    "psutil",
+    "pillow",
+    "flask",
+    "duckduckgo-search",
+    "groq",
+    "mistralai",
+    "beautifulsoup4",
+    "wikipedia",
+    "pandas",
+    "numpy",
+    "matplotlib",
+    "sympy",
+    "python-docx",
+    "openpyxl",
+    "python-pptx",
+]
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
