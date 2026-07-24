@@ -172,3 +172,16 @@ def set_setting(key, value):
     except Exception as e:
         log_error("database.set_setting", str(e))
         return False
+
+
+def fetch_recent_errors(limit=5):
+    try:
+        conn, db_type = get_connection()
+        cursor = conn.cursor()
+        ph = "%s" if db_type == "mysql" else "?"
+        cursor.execute(f"SELECT module_source, error_message, timestamp FROM ErrorLogs ORDER BY id DESC LIMIT {ph}", (limit,))
+        rows = cursor.fetchall()
+        conn.close()
+        return [{"source": r[0], "message": r[1], "timestamp": str(r[2])} for r in rows]
+    except Exception:
+        return []

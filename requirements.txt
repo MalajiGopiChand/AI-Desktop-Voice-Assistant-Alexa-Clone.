@@ -1,11 +1,7 @@
-# Core (required)
+# Core Vercel & Cloud Compatible Requirements
 SpeechRecognition
-pyttsx3
-pyautogui
-psutil
-PyAudio
 requests
-keyboard
+psutil
 pillow
 flask
 duckduckgo-search
@@ -14,25 +10,11 @@ mistralai
 beautifulsoup4
 wikipedia
 
-# Browser automation (recommended)
-playwright
-
-# Vision OCR (optional — install Tesseract separately)
-pytesseract
-
-# Office documents (optional)
+# Optional UI & Document Tools
+pandas
+numpy
+matplotlib
+sympy
 python-docx
 openpyxl
 python-pptx
-pdfplumber
-
-# Analytics & math (optional)
-pandas
-matplotlib
-numpy
-sympy
-
-# Google Calendar (optional)
-google-auth
-google-auth-oauthlib
-google-api-python-client

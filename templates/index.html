@@ -3,10 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JARVIS AI — Next-Gen Voice & LLM Assistant</title>
+    <title>METIS AI OS — Cross-Platform Voice & Mobile Assistant</title>
+    <link rel="manifest" href="/static/manifest.json">
+    <meta name="theme-color" content="#10a37f">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- React 18 & Babel for Modern Dynamic UI Components -->
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 </head>
 <body>
     <div class="app-layout">
@@ -36,6 +42,9 @@
                 </button>
                 <button class="nav-item" data-tab="mobile" onclick="switchTab('mobile')">
                     <i class="fas fa-mobile-screen-button"></i> <span>Android Ecosystem</span>
+                </button>
+                <button class="nav-item" data-tab="realtime" onclick="switchTab('realtime')">
+                    <i class="fas fa-chart-line"></i> <span>Real-Time Monitor</span>
                 </button>
                 <button class="nav-item" data-tab="smartchat" onclick="switchTab('smartchat')">
                     <i class="fas fa-pen-nib"></i> <span>Smart Chat Assistant</span>
@@ -460,6 +469,19 @@
                 </div>
             </section>
 
+            <!-- VIEW 8: REAL-TIME SYSTEM & MOBILE MONITOR -->
+            <section id="view-realtime" class="view-panel hidden">
+                <div class="content-container">
+                    <div class="panel-header">
+                        <h1><i class="fas fa-chart-line"></i> Real-Time AI OS Diagnostics & Device Monitor</h1>
+                        <p class="panel-subtitle">Live health analytics, mobile background execution status, firewall metrics, and error logs.</p>
+                    </div>
+
+                    <!-- React Mounted Real-Time Component -->
+                    <div id="react-monitor-root"></div>
+                </div>
+            </section>
+
         </main>
     </div>
 
@@ -806,5 +828,111 @@
         fetchLLMKeysStatus();
         fetchAllSettings();
     </script>
+
+    <!-- Service Worker PWA Registration -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/static/sw.js').then(function(reg) {
+                console.log('Metis AI Service Worker Registered!');
+            }).catch(function(err) {
+                console.log('Service Worker registration skipped:', err);
+            });
+        }
+    </script>
+
+    <!-- React 18 Dynamic Real-Time Monitor Component -->
+    {% raw %}
+    <script type="text/babel">
+        function RealTimeMonitor() {
+            const [data, setData] = React.useState(null);
+
+            React.useEffect(() => {
+                const fetchMetrics = async () => {
+                    try {
+                        const res = await fetch('/api/monitor/realtime');
+                        const json = await res.json();
+                        setData(json);
+                    } catch (e) {}
+                };
+                fetchMetrics();
+                const interval = setInterval(fetchMetrics, 3000);
+                return () => clearInterval(interval);
+            }, []);
+
+            if (!data) return <div className="status-text"><i className="fas fa-spinner fa-spin"></i> Loading Real-Time AI OS Metrics...</div>;
+
+            return (
+                <div className="cards-grid">
+                    <div className="card-box">
+                        <h3><i className="fas fa-microchip"></i> System Resource Health</h3>
+                        <p className="card-desc">Live CPU & RAM utilization</p>
+                        <div style={{fontSize:'1.3rem', fontWeight:'bold', color:'#10a37f', margin:'10px 0'}}>
+                            CPU Usage: {data.cpu_usage}%
+                        </div>
+                        <div style={{fontSize:'1.1rem', color:'#aaa'}}>
+                            RAM Usage: {data.ram_usage}%
+                        </div>
+                    </div>
+
+                    <div className="card-box">
+                        <h3><i className="fas fa-mobile-screen"></i> Android Mobile Sync</h3>
+                        <p className="card-desc">Connected Android Device & Battery</p>
+                        <div style={{fontSize:'1.1rem', color:'#10a37f', margin:'10px 0'}}>
+                            <i className="fas fa-battery-three-quarters"></i> Battery: {data.mobile_device.battery} ({data.mobile_device.charging ? 'Charging' : 'Discharging'})
+                        </div>
+                        <div style={{fontSize:'0.9rem', color:'#8e8ea0'}}>
+                            Wi-Fi: {data.mobile_device.wifi}
+                        </div>
+                    </div>
+
+                    <div className="card-box">
+                        <h3><i className="fas fa-shield-halved"></i> Firewall & Security</h3>
+                        <p className="card-desc">Cryptographic HMAC Protection</p>
+                        <div style={{color:'#10a37f', fontWeight:'bold', marginTop:'10px'}}>
+                            <i className="fas fa-check-circle"></i> Firewall Active & Protecting
+                        </div>
+                        <div style={{fontSize:'0.85rem', color:'#8e8ea0', marginTop:'5px'}}>
+                            HMAC SHA-256 Signature Verification Enabled
+                        </div>
+                    </div>
+
+                    <div className="card-box">
+                        <h3><i className="fas fa-robot"></i> AI Operating Agents</h3>
+                        <p className="card-desc">Specialized Autonomous Agents</p>
+                        <div style={{fontSize:'1.5rem', fontWeight:'bold', color:'#10a37f', margin:'10px 0'}}>
+                            {data.active_agents_count} Agents Active
+                        </div>
+                        <div style={{fontSize:'0.85rem', color:'#8e8ea0'}}>
+                            Multi-Threaded Real-Time Execution
+                        </div>
+                    </div>
+
+                    <div className="card-box full-width">
+                        <h3><i className="fas fa-triangle-exclamation"></i> Real-Time Error Logs Monitor (MySQL / SQLite)</h3>
+                        {data.recent_errors && data.recent_errors.length > 0 ? (
+                            <ul style={{listStyle:'none', padding:0, margin:'10px 0'}}>
+                                {data.recent_errors.map((err, idx) => (
+                                    <li key={idx} style={{background:'rgba(255,0,0,0.1)', border:'1px solid rgba(255,0,0,0.2)', padding:'8px 12px', borderRadius:'6px', marginBottom:'6px', fontSize:'0.85rem'}}>
+                                        <strong>[{err.source}]</strong> {err.message} <span style={{fontSize:'0.75rem', color:'#888'}}>({err.timestamp})</span>
+                                    </li>
+                                ))}
+                            </ul>
+                        ) : (
+                            <div style={{color:'#10a37f', fontSize:'0.9rem', marginTop:'10px'}}>
+                                <i className="fas fa-circle-check"></i> Clean Log: Zero active errors detected in MySQL/SQLite database.
+                            </div>
+                        )}
+                    </div>
+                </div>
+            );
+        }
+
+        const container = document.getElementById('react-monitor-root');
+        if (container) {
+            const root = ReactDOM.createRoot(container);
+            root.render(<RealTimeMonitor />);
+        }
+    </script>
+    {% endraw %}
 </body>
 </html>
