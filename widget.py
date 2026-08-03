@@ -204,28 +204,35 @@ class RobotCompanion:
     def update_loop(self):
         try:
             if os.path.exists(STATE_FILE):
-                with open(STATE_FILE, "r", encoding="utf-8") as f:
+                with open(STATE_FILE, "r", encoding="utf-8", errors="ignore") as f:
                     st = f.read().strip()
-                    if st:
+                    if st in ("idle", "listening", "processing", "speaking"):
                         self.current_state = st
             if os.path.exists(TEXT_FILE):
-                with open(TEXT_FILE, "r", encoding="utf-8") as f:
+                with open(TEXT_FILE, "r", encoding="utf-8", errors="ignore") as f:
                     txt = f.read().strip()
                     if txt:
                         self.current_text = txt
         except Exception:
             pass
 
-        self.draw_robot()
-        self.root.after(40, self.update_loop)
+        try:
+            self.draw_robot()
+        except Exception as e:
+            print(f"Widget render notice: {e}")
+
+        self.root.after(50, self.update_loop)
 
 
 if __name__ == "__main__":
-    with open(STATE_FILE, "w", encoding="utf-8") as f:
-        f.write("idle")
-    with open(TEXT_FILE, "w", encoding="utf-8") as f:
-        f.write("METIS AI Assistant is active!")
+    try:
+        with open(STATE_FILE, "w", encoding="utf-8") as f:
+            f.write("idle")
+        with open(TEXT_FILE, "w", encoding="utf-8") as f:
+            f.write("METIS AI Assistant is active!")
 
-    root = tk.Tk()
-    app = RobotCompanion(root)
-    root.mainloop()
+        root = tk.Tk()
+        app = RobotCompanion(root)
+        root.mainloop()
+    except Exception as e:
+        print(f"Widget startup notice: {e}")
