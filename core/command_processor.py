@@ -215,6 +215,32 @@ class CommandProcessor:
         from services.weather_service import get_weather
         from services.news_service import get_news
 
+        # --- Direct Web & Port Shortcuts ---
+        if any(w in command for w in ("open chatgpt", "launch chatgpt", "chatgpt")):
+            import webbrowser
+            webbrowser.open("https://chatgpt.com")
+            return "Opening ChatGPT in your browser."
+
+        if "open localhost:3000" in command or "localhost 3000" in command or "localhost:3000" in command:
+            import webbrowser
+            webbrowser.open("http://localhost:3000")
+            return "Opening localhost:3000 in your browser."
+
+        if "open localhost:5000" in command or "localhost 5000" in command or "localhost:5000" in command:
+            import webbrowser
+            webbrowser.open("http://localhost:5000")
+            return "Opening localhost:5000 in your browser."
+
+        if any(w in command for w in ("open gmail", "launch gmail")):
+            import webbrowser
+            webbrowser.open("https://mail.google.com")
+            return "Opening Gmail in your browser."
+
+        if any(w in command for w in ("open github", "launch github")):
+            import webbrowser
+            webbrowser.open("https://github.com")
+            return "Opening GitHub in your browser."
+
         # --- WhatsApp & Messaging Protocols ---
         if any(p in command for p in ("send whatsapp message to", "send message to", "whatsapp message to")):
             parts = command.split("to ", 1)[-1]
@@ -288,7 +314,32 @@ class CommandProcessor:
             r = self.agents["desktop_agent"].execute("screenshot", {})
             return r.get("message", "Screenshot taken successfully.")
 
-        # --- Volume Up / Down / Mute Direct Protocol ---
+        # --- Comprehensive System & Power Direct Protocols ---
+        if command in ("wake up metis", "wake up", "wake up jarvis", "start metis"):
+            return "Metis is online, awake, and listening to your commands."
+
+        if command in ("go to sleep", "sleep", "sleep system", "standby"):
+            r = self.agents["desktop_agent"].execute("sleep", {})
+            return r.get("message", "Entering sleep mode.")
+
+        if command in ("shutdown computer", "shutdown system", "turn off pc", "shutdown"):
+            r = self.agents["desktop_agent"].execute("shutdown", {})
+            return r.get("message", "Shutting down system.")
+
+        if command in ("restart computer", "restart system", "reboot pc", "restart"):
+            r = self.agents["desktop_agent"].execute("restart", {})
+            return r.get("message", "Restarting system.")
+
+        if command in ("lock screen", "lock computer", "lock pc", "log out", "logout"):
+            r = self.agents["desktop_agent"].execute("lock", {})
+            return r.get("message", "Locked workstation.")
+
+        # --- Comprehensive Volume & Brightness Direct Protocols ---
+        if any(w in command for w in ("increase full volume", "full volume", "max volume", "volume max", "100% volume")):
+            for _ in range(3):
+                self.agents["desktop_agent"].execute("volume_up", {})
+            return "Volume set to maximum."
+
         if any(w in command for w in ("volume up", "valume up", "increase volume", "raise volume", "volume high")):
             r = self.agents["desktop_agent"].execute("volume_up", {})
             return r.get("message", "Volume increased.")
@@ -297,9 +348,121 @@ class CommandProcessor:
             r = self.agents["desktop_agent"].execute("volume_down", {})
             return r.get("message", "Volume decreased.")
 
-        if any(w in command for w in ("mute volume", "unmute volume", "volume mute", "mute audio", "unmute audio")):
+        if any(w in command for w in ("mute volume", "unmute volume", "volume mute", "mute audio", "unmute audio", "mute")):
             r = self.agents["desktop_agent"].execute("mute_volume", {})
             return r.get("message", "Volume muted/unmuted.")
+
+        # --- Comprehensive Application Launchers & Closers ---
+        if command in ("open chrome", "launch chrome", "start chrome"):
+            r = self.agents["desktop_agent"].execute("open_app", {"app_name": "chrome"})
+            return r.get("message", "Opened Chrome.")
+
+        if command in ("close chrome", "exit chrome"):
+            r = self.agents["desktop_agent"].execute("close_window", {})
+            return r.get("message", "Closed Chrome.")
+
+        if any(w in command for w in ("open vs code", "open vscode", "launch vs code", "open code")):
+            r = self.agents["desktop_agent"].execute("open_app", {"app_name": "vscode"})
+            return r.get("message", "Opened VS Code.")
+
+        if any(w in command for w in ("open file explorer", "open explorer", "open my computer", "open files")):
+            r = self.agents["desktop_agent"].execute("open_app", {"app_name": "explorer"})
+            return r.get("message", "Opened File Explorer.")
+
+        if any(w in command for w in ("open settings", "launch settings", "windows settings")):
+            r = self.agents["desktop_agent"].execute("open_app", {"app_name": "settings"})
+            return r.get("message", "Opened Settings.")
+
+        if any(w in command for w in ("open calculator", "launch calculator", "calc")):
+            r = self.agents["desktop_agent"].execute("open_app", {"app_name": "calculator"})
+            return r.get("message", "Opened Calculator.")
+
+        if any(w in command for w in ("open notepad", "launch notepad", "notepad")):
+            r = self.agents["desktop_agent"].execute("open_app", {"app_name": "notepad"})
+            return r.get("message", "Opened Notepad.")
+
+        if any(w in command for w in ("launch spotify", "open spotify", "spotify")):
+            r = self.agents["desktop_agent"].execute("open_app", {"app_name": "spotify"})
+            return r.get("message", "Opened Spotify.")
+
+        if any(w in command for w in ("launch discord", "open discord", "discord")):
+            r = self.agents["desktop_agent"].execute("open_app", {"app_name": "discord"})
+            return r.get("message", "Opened Discord.")
+
+        if any(w in command for w in ("open whatsapp", "launch whatsapp", "whatsapp")):
+            r = self.agents["desktop_agent"].execute("open_app", {"app_name": "whatsapp"})
+            return r.get("message", "Opened WhatsApp.")
+
+        if any(w in command for w in ("open task manager", "task manager", "open taskmanager")):
+            r = self.agents["desktop_agent"].execute("open_app", {"app_name": "task manager"})
+            return r.get("message", "Opened Task Manager.")
+
+        if any(w in command for w in ("show system status", "system status", "battery status", "cpu usage", "memory usage", "ram usage")):
+            return system_info()
+
+        if any(w in command for w in ("open downloads", "downloads folder", "show downloads")):
+            r = self.agents["desktop_agent"].execute("open_folder", {"path": os.path.expanduser("~/Downloads")})
+            return r.get("message", "Opened Downloads folder.")
+
+        # --- Direct Web & Port Shortcuts ---
+        if "open localhost:3000" in command or "localhost 3000" in command or "localhost:3000" in command:
+            import webbrowser
+            webbrowser.open("http://localhost:3000")
+            return "Opening localhost:3000 in your browser."
+
+        if "open localhost:5000" in command or "localhost 5000" in command or "localhost:5000" in command:
+            import webbrowser
+            webbrowser.open("http://localhost:5000")
+            return "Opening localhost:5000 in your browser."
+
+        if any(w in command for w in ("open gmail", "launch gmail")):
+            import webbrowser
+            webbrowser.open("https://mail.google.com")
+            return "Opening Gmail in your browser."
+
+        if any(w in command for w in ("open github", "launch github")):
+            import webbrowser
+            webbrowser.open("https://github.com")
+            return "Opening GitHub in your browser."
+
+        if any(w in command for w in ("open chatgpt", "launch chatgpt")):
+            import webbrowser
+            webbrowser.open("https://chatgpt.com")
+            return "Opening ChatGPT in your browser."
+
+        if command.startswith("search google for "):
+            q = command.replace("search google for ", "").strip()
+            r = self.agents["browser_agent"].execute("search", {"query": q, "engine": "google"})
+            return r.get("message", f"Searched Google for {q}.")
+
+        # --- Developer Git & Terminal Direct Protocols ---
+        if any(w in command for w in ("open terminal", "open cmd", "open console", "open command prompt")):
+            r = self.agents["desktop_agent"].execute("open_app", {"app_name": "cmd"})
+            return r.get("message", "Opened Terminal.")
+
+        if "git status" in command:
+            r = self.agents["coding_agent"].execute("git_status", {})
+            return r.get("message", "Git status retrieved.")
+
+        if "git add ." in command or "git add" in command:
+            import subprocess
+            subprocess.run(["git", "add", "."], cwd=os.getcwd())
+            return "Staged workspace changes with git add ."
+
+        if "git commit" in command:
+            import subprocess
+            subprocess.run(["git", "commit", "-m", "Auto-commit by Metis AI OS"], cwd=os.getcwd())
+            return "Committed workspace changes with git commit."
+
+        if "git push" in command:
+            import subprocess
+            subprocess.run(["git", "-c", "http.sslVerify=false", "push", "origin", "main"], cwd=os.getcwd())
+            return "Pushed workspace commits to GitHub repository."
+
+        if any(w in command for w in ("pull latest changes", "git pull")):
+            import subprocess
+            subprocess.run(["git", "pull", "origin", "main"], cwd=os.getcwd())
+            return "Pulled latest changes from GitHub."
 
         # --- Vision Screen OCR Direct Protocol ---
         if any(p in command for p in ("read screen", "read my screen", "read current screen", "current screen will be read", "screen read", "read the screen", "ocr screen", "scan screen")):
