@@ -25,14 +25,10 @@ def start_assistant():
             from speech import stop_speaking
             stop_speaking()
 
-            if "exit" in text or "quit" in text or "goodbye" in text:
-                response = process_command("exit")
-                speak(response)
-                save_history(text, "Exited successfully")
-                # Instead of breaking (which kills the thread), we can just go dormant 
-                # but let's keep the exit command functioning by sleeping for a bit
-                speak("I will stop listening for now.")
-                time.sleep(10)
+            if text in ("exit", "quit", "goodbye", "stop listening", "go dormant"):
+                speak("Goodbye! I am ready whenever you need me.")
+                save_history(text, "User said goodbye")
+                time.sleep(2)
                 continue
 
             from speech import set_widget_state

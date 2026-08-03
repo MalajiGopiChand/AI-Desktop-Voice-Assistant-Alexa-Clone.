@@ -4,6 +4,7 @@
 credentials.json
 token.json
 widget_state.txt
+widget_text.txt
 
 # Python Cache & Build
 __pycache__/

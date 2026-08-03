@@ -52,7 +52,17 @@ def handle_command():
             lower = lower.replace(wake, "", 1).strip(" ,.")
             break
 
+    from speech import set_widget_state, speak
+    set_widget_state("processing", command_text)
+
     structured = processor.process_structured(lower, model=model)
+
+    reply = structured.get("spoken_reply") or structured.get("response") or ""
+    if reply:
+        speak(reply)
+    else:
+        set_widget_state("idle")
+
     return jsonify(structured)
 
 

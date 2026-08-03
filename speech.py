@@ -70,6 +70,9 @@ def _tts_worker():
             if text is None:
                 break
             print(f"Assistant (Cloud Mode): {text}")
+            set_widget_state("speaking", text)
+            time.sleep(min(max(len(text) * 0.04, 1.0), 4.0))
+            set_widget_state("idle")
             tts_queue.task_done()
         return
 
@@ -125,6 +128,10 @@ def _tts_worker():
                     engine_ref.setProperty("volume", VOICE_VOLUME)
                 except Exception:
                     pass
+        else:
+            set_widget_state("speaking", text)
+            time.sleep(min(max(len(text) * 0.04, 1.0), 4.0))
+            set_widget_state("idle")
         tts_queue.task_done()
 
 
@@ -153,7 +160,7 @@ def stop_speaking():
 
 
 # ── STT engine ────────────────────────────────────────────────────────────────
-# Single shared recognizer to avoid resource re-creation on every call
+# Shared recognizer and microphone to avoid resource re-creation on every call
 if SR_AVAILABLE:
     _recognizer = sr.Recognizer()
     _recognizer.energy_threshold        = 280
@@ -161,10 +168,15 @@ if SR_AVAILABLE:
     _recognizer.pause_threshold         = 0.5
     _recognizer.phrase_threshold        = 0.1
     _recognizer.non_speaking_duration   = 0.3
+    try:
+        _shared_mic = sr.Microphone()
+    except Exception:
+        _shared_mic = None
 else:
     _recognizer = None
+    _shared_mic = None
 
-# Mutex: only ONE listen() allowed at a time (prevents file-descriptor explosion)
+# Mutex: only ONE listen() allowed at a time
 _listen_lock   = threading.Lock()
 _error_backoff = 0.5   # starts at 0.5 s, doubles on repeated network errors
 
@@ -183,7 +195,8 @@ def listen():
         return ""
 
     try:
-        with sr.Microphone() as source:
+        mic_source = _shared_mic if _shared_mic else sr.Microphone()
+        with mic_source as source:
             print("Listening...", flush=True)
             set_widget_state("listening")
 
