@@ -1,160 +1,131 @@
-# METIS AI Operating System — Technical Documentation & User Manual
+# 🤖 METIS AI Operating System — Executive Presentation & Technical Manual
 
-A production-ready desktop AI assistant with **15 specialized agents**, voice recognition, vision, Playwright browser automation, Google Calendar, Office documents, data analytics, mathematical engine, and long-term memory.
+[![Python](https://img.shields.io/badge/Python-3.10%2B-blue.svg)](https://www.python.org/)
+[![Framework](https://img.shields.io/badge/Framework-Flask%20%7C%20React%2018-green.svg)](https://react.dev/)
+[![AI Engine](https://img.shields.io/badge/AI%20Engine-Groq%20%7C%20Mistral%20AI-orange.svg)](https://console.groq.com/)
+[![Mobile PWA](https://img.shields.io/badge/Mobile-Android%20PWA-brightgreen.svg)](https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps)
+[![License](https://img.shields.io/badge/License-MIT-purple.svg)](LICENSE)
+
+A production-grade, multimodal AI Operating System featuring **16 autonomous agents**, hands-free voice control, computer vision target navigation, Playwright browser automation, cross-platform Android mobile integration, long-term SQLite/MySQL memory, and real-time React 18 telemetry.
 
 ---
 
-## System Architecture
+## 🌟 Key Highlights & Architecture Presentation
+
+### 1. Unified Multimodal Pipeline
+Metis processes inputs seamlessly across **Voice (Speech-to-Text)**, **Web UI (React 18 & Babel JSX)**, **Mobile PWA Touch**, and **REST API Endpoints**, routing queries through intent classifiers to specialized agents.
+
+### 2. Dual Cloud & Desktop Execution Mode
+- **Local Desktop Mode**: Full OS GUI control, target-based mouse OCR clicking, `pyautogui` automation, and offline `pyttsx3` voice output.
+- **Vercel Cloud Serverless Mode**: Lightweight headless execution with lazy module initialization, avoiding native C-compilation dependencies (PortAudio/PyAudio) and X11 `$DISPLAY` crashes.
+
+### 3. Cross-Platform Android Companion
+- **Hands-Free Wake Word**: Responsive Web Speech activation ("Hey Metis").
+- **ChatGPT Mobile UI**: Clean, full-height dark interface with floating robot visor companion (`METIS [ ⊙ ‿ ⊙ ]`).
+- **Mobile Device Protocols**: Direct dialer initialization, SMS drafting, alarm scheduler, and notification intelligence summaries.
+
+---
+
+## 🏗️ System Architecture Diagram
 
 ```mermaid
 graph TD
-    User([User Voice STT / Web UI]) --> VoiceEngine[Voice Engine & Web API]
-    VoiceEngine --> CmdProc[Unified Command Processor]
-    CmdProc --> |Direct Match| DirectExec[Direct Windows & Browser Actions]
-    CmdProc --> |Custom Training| CustomDB[Custom Commands Database]
-    CmdProc --> |Intent Classifier| Brain[Groq AI Brain llama-3.1-8b]
-    Brain --> Planner[LLM Multi-Agent Planner llama-3.3-70b]
-    Planner --> SafetyGate[Safety & Confirmation Gate]
-    SafetyGate --> Agents[15 Specialized Agents]
-    Agents --> Output[TTS Voice / Desktop UI / Browser]
+    User([User Input: Voice / Touch / Web UI / REST]) --> Engine[Speech & REST Web Server]
+    Engine --> CmdProc[Unified Command Processor]
+    
+    subgraph Routing & Safety Layer
+        CmdProc --> |Direct Match| DirectExec[Zero-Latency Direct System Actions]
+        CmdProc --> |Custom Training| CustomDB[Custom Commands Database]
+        CmdProc --> |Intent Classifier| Brain[Groq Llama 3.1 8B / Mistral AI]
+        Brain --> Planner[LLM Multi-Agent Planner Llama 3.3 70B]
+        Planner --> SafetyGate[Safety & Confirmation Interceptor]
+    end
+    
+    SafetyGate --> Agents[16 Specialized Autonomous Agents]
+    
+    subgraph Execution Ecosystem
+        Agents --> DesktopAgent[Desktop GUI & OCR Vision]
+        Agents --> MobileAgent[Android Calls, SMS, Alarms, Notifications]
+        Agents --> CommsAgent[WhatsApp & Email Messaging]
+        Agents --> BrowserAgent[Playwright Web Navigation]
+        Agents --> ResearchAgent[DuckDuckGo & Wikipedia Data]
+        Agents --> OtherAgents[Coding, Math, Office, Analytics, Media]
+    end
+    
+    Agents --> Output[Web Speech Synthesis / TTS Engine / React 18 Dashboard]
 ```
 
 ---
 
-## Quick Start
+## 🛠️ Complete 16-Agent Roster
+
+| Agent Name | Primary File | Capabilities & Sample Voice Commands |
+| :--- | :--- | :--- |
+| **DesktopAgent** | [agents/desktop_agent.py](file:///c:/Users/Gopi/OneDrive/Desktop/AI%20Desktop%20Voice%20Assistant/agents/desktop_agent.py) | Launches Windows apps (Chrome, Notepad, Calc, VS Code, Task Manager), controls windows, system power, and audio. <br>*"open notepad"*, *"open chrome profile Work"* |
+| **VisionAgent** | [agents/vision_agent.py](file:///c:/Users/Gopi/OneDrive/Desktop/AI%20Desktop%20Voice%20Assistant/agents/vision_agent.py) | Takes screenshots, extracts text via OCR, and performs coordinate target-based mouse clicking (`find_and_click_element`). <br>*"read screen"*, *"click submit button"* |
+| **MobileAgent** | [agents/mobile_agent.py](file:///c:/Users/Gopi/OneDrive/Desktop/AI%20Desktop%20Voice%20Assistant/agents/mobile_agent.py) | Manages phone calls, SMS drafting, alarm setup, notification summaries, and smart tone rephrasing. <br>*"call Rahul"*, *"set alarm for 6 AM"* |
+| **CommsAgent** | [agents/comms_agent.py](file:///c:/Users/Gopi/OneDrive/Desktop/AI%20Desktop%20Voice%20Assistant/agents/comms_agent.py) | Automated WhatsApp Web messaging, email drafting, popup explainer, and command cheat-sheet rendering. <br>*"send whatsapp to Rahul: Meeting at 3 PM"* |
+| **BrowserAgent** | [agents/browser_agent.py](file:///c:/Users/Gopi/OneDrive/Desktop/AI%20Desktop%20Voice%20Assistant/agents/browser_agent.py) | Playwright browser navigation, webpage extraction, and automated form filling. <br>*"search google for AI news"*, *"open github.com"* |
+| **ResearchAgent** | [agents/research_agent.py](file:///c:/Users/Gopi/OneDrive/Desktop/AI%20Desktop%20Voice%20Assistant/agents/research_agent.py) | Real-time web research via DuckDuckGo, Wikipedia article summaries, and topic comparisons. <br>*"search wikipedia for Quantum Computing"* |
+| **CodingAgent** | [agents/coding_agent.py](file:///c:/Users/Gopi/OneDrive/Desktop/AI%20Desktop%20Voice%20Assistant/agents/coding_agent.py) | Generates Python/JS code, explains snippets, fixes tracebacks, checks git status, and executes code safely. <br>*"generate python script for web scraping"* |
+| **AutomationAgent**| [agents/automation_agent.py](file:///c:/Users/Gopi/OneDrive/Desktop/AI%20Desktop%20Voice%20Assistant/agents/automation_agent.py) | Parses complex multi-step instructions into JSON UI automation macro sequences. <br>*"open chrome, wait 2 seconds, search weather"* |
+| **ConversationAgent**| [agents/conversation_agent.py](file:///c:/Users/Gopi/OneDrive/Desktop/AI%20Desktop%20Voice%20Assistant/agents/conversation_agent.py) | General natural language Q&A fallback invoking Groq / Mistral LLM brain. <br>*"explain how transformer models work"* |
+| **CalendarAgent**| [agents/calendar_agent.py](file:///c:/Users/Gopi/OneDrive/Desktop/AI%20Desktop%20Voice%20Assistant/agents/calendar_agent.py) | Google Calendar API integration for listing upcoming events and setting reminders. <br>*"what's on my calendar today"* |
+| **OfficeAgent** | [agents/office_agent.py](file:///c:/Users/Gopi/OneDrive/Desktop/AI%20Desktop%20Voice%20Assistant/agents/office_agent.py) | Reads/writes Word (.docx), Excel (.xlsx), PDF (.pdf), and PowerPoint (.pptx) documents. <br>*"read report.pdf"*, *"create report about AI trends"* |
+| **AnalyticsAgent** | [agents/analytics_agent.py](file:///c:/Users/Gopi/OneDrive/Desktop/AI%20Desktop%20Voice%20Assistant/agents/analytics_agent.py) | Analyzes CSV/Excel datasets using Pandas, generates Matplotlib charts, and runs SQL queries. <br>*"analyze sales.csv and create bar chart"* |
+| **MathAgent** | [math_agent.py](file:///c:/Users/Gopi/OneDrive/Desktop/AI%20Desktop%20Voice%20Assistant/agents/math_agent.py) | Arithmetic, calculus (derivatives/integrals) via SymPy, function plotting, and stats. <br>*"solve equation x**2 - 4 = 0"* |
+| **FileAgent** | [file_agent.py](file:///c:/Users/Gopi/OneDrive/Desktop/AI%20Desktop%20Voice%20Assistant/agents/file_agent.py) | Searches files by pattern, organizes Downloads folder, and detects duplicate MD5 hashes. <br>*"organize my Downloads folder"* |
+| **MediaAgent** | [media_agent.py](file:///c:/Users/Gopi/OneDrive/Desktop/AI%20Desktop%20Voice%20Assistant/agents/media_agent.py) | HTML5 video & audio player controls (play, pause, rewind, fast forward, full screen, mute). <br>*"play video"*, *"pause video"*, *"full screen"* |
+| **InfoAgent** | [info_agent.py](file:///c:/Users/Gopi/OneDrive/Desktop/AI%20Desktop%20Voice%20Assistant/agents/info_agent.py) | Live weather via OpenWeatherMap and tech news via RSS feeds / NewsAPI. <br>*"what is the weather in Mumbai"* |
+
+---
+
+## ⚡ Quick Start & Deployment Guide
+
+### Local Desktop Launch (Windows / Linux / macOS)
 
 ```powershell
-# 1. First-time setup check
-python scripts/setup_jarvis.py
+# 1. Install dependencies
+pip install -r requirements.txt
 
-# 2. Save your Groq API key
+# 2. Configure API Keys
 python scripts/save_api_key.py gsk_YOUR_GROQ_KEY_HERE
 
-# 3. Launch JARVIS AI OS
+# 3. Launch METIS AI Operating System
 python main.py
 ```
+- Access Desktop Web Dashboard: **[http://localhost:5000](http://localhost:5000)**
 
-Web Dashboard: **[http://localhost:5000](http://localhost:5000)**
+### Vercel Serverless Cloud Deployment
 
----
+```bash
+# 1. Install Vercel CLI
+npm install -g vercel
 
-## File-by-File Code Breakdown & Developer Guide
-
-### Core System Files
-
-| File | Purpose & How to Use |
-| :--- | :--- |
-| [main.py](file:///c:/Users/Gopi/OneDrive/Desktop/AI%20Desktop%20Voice%20Assistant/main.py) | **Main System Entry Point**. Initializes SQLite database, launches background orchestrator thread, starts Tkinter floating visualizer widget, and runs Flask web server on port 5000. <br>`python main.py` |
-| [app.py](file:///c:/Users/Gopi/OneDrive/Desktop/AI%20Desktop%20Voice%20Assistant/app.py) | **Web Interface & API**. Implements Flask REST endpoints (`/api/command`, `/api/history`, `/api/train`, `/api/settings/keys`, `/api/voices`) and serves the modern Web Dashboard. |
-| [config.py](file:///c:/Users/Gopi/OneDrive/Desktop/AI%20Desktop%20Voice%20Assistant/config.py) | **Configuration Manager**. Loads `.env` environment variables, sets directory paths, voice rates, wake word settings, and database credentials. |
-| [database.py](file:///c:/Users/Gopi/OneDrive/Desktop/AI%20Desktop%20Voice%20Assistant/database.py) | **SQLite Database Manager**. Manages `History`, `Settings`, `Users`, and `CustomCommands` tables in `database/assistant.db`. |
-| [speech.py](file:///c:/Users/Gopi/OneDrive/Desktop/AI%20Desktop%20Voice%20Assistant/speech.py) | **Speech Module**. Dedicated pyttsx3 worker thread for smooth TTS audio queue output and SpeechRecognition microphone listener. |
-| [utils.py](file:///c:/Users/Gopi/OneDrive/Desktop/AI%20Desktop%20Voice%20Assistant/utils.py) | **System Utilities**. System hardware info (CPU, RAM, battery), time/date formatting, fallback app opening, and web search wrappers. |
-| [widget.py](file:///c:/Users/Gopi/OneDrive/Desktop/AI%20Desktop%20Voice%20Assistant/widget.py) | **Desktop Siri Visualizer**. Floating transparent Tkinter widget that animates based on state (`idle`, `listening`, `processing`, `speaking`). |
-
----
-
-### Core Intelligence Engine (`core/`)
-
-| File | Purpose & How to Use |
-| :--- | :--- |
-| [core/command_processor.py](file:///c:/Users/Gopi/OneDrive/Desktop/AI%20Desktop%20Voice%20Assistant/core/command_processor.py) | **Central Execution Pipeline**. Processes direct zero-latency app commands, WhatsApp protocols, Chrome profile switches, intent classification, and multi-agent plan execution. |
-| [core/brain.py](file:///c:/Users/Gopi/OneDrive/Desktop/AI%20Desktop%20Voice%20Assistant/core/brain.py) | **Natural Language Brain**. Uses Groq `llama-3.1-8b-instant` for conversational responses, Q&A, and intent classification. |
-| [core/planner.py](file:///c:/Users/Gopi/OneDrive/Desktop/AI%20Desktop%20Voice%20Assistant/core/planner.py) | **LLM Task Planner**. Uses Groq `llama-3.3-70b-versatile` to convert complex multi-step requests into raw JSON agent execution plans. |
-| [core/llm_client.py](file:///c:/Users/Gopi/OneDrive/Desktop/AI%20Desktop%20Voice%20Assistant/core/llm_client.py) | **Groq SDK Client**. Shared client interface retrieving API keys dynamically from environment or local SQLite settings. |
-| [core/orchestrator.py](file:///c:/Users/Gopi/OneDrive/Desktop/AI%20Desktop%20Voice%20Assistant/core/orchestrator.py) | **Voice Orchestrator Loop**. Daemon thread running microphone listening, wake word detection, and safety gate confirmations. |
-| [core/memory.py](file:///c:/Users/Gopi/OneDrive/Desktop/AI%20Desktop%20Voice%20Assistant/core/memory.py) | **Memory System**. Manages short-term conversation context and long-term facts database (`jarvis_memory.db`). |
-| [core/safety.py](file:///c:/Users/Gopi/OneDrive/Desktop/AI%20Desktop%20Voice%20Assistant/core/safety.py) | **Safety Gate**. Intercepts destructive actions (file deletion, system shutdown, sending messages) and requires explicit confirmation. |
-| [core/learning.py](file:///c:/Users/Gopi/OneDrive/Desktop/AI%20Desktop%20Voice%20Assistant/core/learning.py) | **Usage Tracker**. Analyzes command execution frequencies and suggests automated shortcuts. |
-| [core/wake_word.py](file:///c:/Users/Gopi/OneDrive/Desktop/AI%20Desktop%20Voice%20Assistant/core/wake_word.py) | **Wake Word Engine**. Supports optional offline Picovoice Porcupine detection with STT fallback. |
-
----
-
-### All 15 Specialized Agents (`agents/`)
-
-| Agent | File Path | Capabilities & Example Voice Commands |
-| :--- | :--- | :--- |
-| **DesktopAgent** | [desktop_agent.py](file:///c:/Users/Gopi/OneDrive/Desktop/AI%20Desktop%20Voice%20Assistant/agents/desktop_agent.py) | Launches Windows desktop apps (Chrome, Notepad, Calc, Paint, VS Code, Cmd, Word, Excel, Task Manager). Controls windows, keyboard, screenshots, and system power. <br>*"open notepad"*, *"open chrome profile Work"*, *"take screenshot"* |
-| **BrowserAgent** | [browser_agent.py](file:///c:/Users/Gopi/OneDrive/Desktop/AI%20Desktop%20Voice%20Assistant/agents/browser_agent.py) | Playwright & browser navigation, web searches, webpage text extraction, and automated form filling. <br>*"search google for AI news"*, *"open github.com"*, *"read page"* |
-| **CommsAgent** | [comms_agent.py](file:///c:/Users/Gopi/OneDrive/Desktop/AI%20Desktop%20Voice%20Assistant/agents/comms_agent.py) | Gmail inbox opening/composing and automated WhatsApp contact search, chat opening, typing, and message sending. <br>*"open chat with Rahul"*, *"type message Meeting at 3 PM"*, *"send message"* |
-| **MediaAgent** | [media_agent.py](file:///c:/Users/Gopi/OneDrive/Desktop/AI%20Desktop%20Voice%20Assistant/agents/media_agent.py) | Website HTML5 video & audio player controls: play, pause, rewind (10s), fast forward (10s), full screen, mute, and Spotify launching. <br>*"play video"*, *"pause video"*, *"forward"*, *"full screen"* |
-| **ResearchAgent** | [research_agent.py](file:///c:/Users/Gopi/OneDrive/Desktop/AI%20Desktop%20Voice%20Assistant/agents/research_agent.py) | Web research via DuckDuckGo, Wikipedia article summaries, text summarization, and topic comparisons. <br>*"search wikipedia for Quantum Computing"*, *"summarize this text"* |
-| **CodingAgent** | [coding_agent.py](file:///c:/Users/Gopi/OneDrive/Desktop/AI%20Desktop%20Voice%20Assistant/agents/coding_agent.py) | Generates Python/JS code, explains snippets, fixes tracebacks, checks git status, and executes Python scripts locally. <br>*"generate python script to scrape web"*, *"explain this code"* |
-| **AutomationAgent**| [automation_agent.py](file:///c:/Users/Gopi/OneDrive/Desktop/AI%20Desktop%20Voice%20Assistant/agents/automation_agent.py) | Parses complex multi-step instructions into JSON UI automation sequences (`type`, `press`, `wait`, `open_app`). <br>*"open chrome, wait 2 seconds, search for weather"* |
-| **VisionAgent** | [vision_agent.py](file:///c:/Users/Gopi/OneDrive/Desktop/AI%20Desktop%20Voice%20Assistant/agents/vision_agent.py) | Takes screenshots, performs PyTesseract OCR text extraction, and describes visible screen content. <br>*"read my screen"*, *"describe what is on screen"* |
-| **OfficeAgent** | [office_agent.py](file:///c:/Users/Gopi/OneDrive/Desktop/AI%20Desktop%20Voice%20Assistant/agents/office_agent.py) | Reads/writes Word (.docx), Excel (.xlsx), PDF (.pdf), PowerPoint (.pptx), and generates Word reports. <br>*"read report.pdf"*, *"create report about AI trends"* |
-| **AnalyticsAgent** | [analytics_agent.py](file:///c:/Users/Gopi/OneDrive/Desktop/AI%20Desktop%20Voice%20Assistant/agents/analytics_agent.py) | Analyzes CSV/Excel datasets using Pandas, generates Matplotlib charts, executes SQLite queries. <br>*"analyze sales.csv and create bar chart"* |
-| **MathAgent** | [math_agent.py](file:///c:/Users/Gopi/OneDrive/Desktop/AI%20Desktop%20Voice%20Assistant/agents/math_agent.py) | Arithmetic, algebra, calculus (derivatives/integrals) via SymPy, function plotting, and statistical analysis. <br>*"calculate 2 + 2"*, *"solve equation x**2 - 4 = 0"*, *"plot sin(x)"* |
-| **FileAgent** | [file_agent.py](file:///c:/Users/Gopi/OneDrive/Desktop/AI%20Desktop%20Voice%20Assistant/agents/file_agent.py) | Searches files by pattern, detects duplicate files via MD5 hashing, organizes Downloads folder by extension. <br>*"organize my Downloads folder"*, *"find duplicate files"* |
-| **InfoAgent** | [info_agent.py](file:///c:/Users/Gopi/OneDrive/Desktop/AI%20Desktop%20Voice%20Assistant/agents/info_agent.py) | Live weather via OpenWeatherMap and tech news via RSS feeds / NewsAPI. <br>*"what is the weather in Mumbai"*, *"latest tech news"* |
-| **CalendarAgent**| [calendar_agent.py](file:///c:/Users/Gopi/OneDrive/Desktop/AI%20Desktop%20Voice%20Assistant/agents/calendar_agent.py) | Google Calendar API integration to list upcoming events and set reminders. <br>*"what's on my calendar today"*, *"create reminder for team meeting"* |
-| **ConversationAgent**| [conversation_agent.py](file:///c:/Users/Gopi/OneDrive/Desktop/AI%20Desktop%20Voice%20Assistant/agents/conversation_agent.py) | General Q&A fallback agent invoking Groq LLM brain. <br>*"who was Albert Einstein"*, *"explain how neural networks work"* |
-
----
-
-### External Services (`services/`)
-
-- [services/playwright_helper.py](file:///c:/Users/Gopi/OneDrive/Desktop/AI%20Desktop%20Voice%20Assistant/services/playwright_helper.py): Controls Chrome browser using Playwright for automated search, form filling, and DOM text extraction.
-- [services/weather_service.py](file:///c:/Users/Gopi/OneDrive/Desktop/AI%20Desktop%20Voice%20Assistant/services/weather_service.py): OpenWeatherMap API client for temperature, humidity, and wind stats.
-- [services/news_service.py](file:///c:/Users/Gopi/OneDrive/Desktop/AI%20Desktop%20Voice%20Assistant/services/news_service.py): Fetches RSS news feeds from BBC and Hacker News with NewsAPI fallback.
-- [services/file_intel.py](file:///c:/Users/Gopi/OneDrive/Desktop/AI%20Desktop%20Voice%20Assistant/services/file_intel.py): Fast file search and MD5 duplicate hash detection.
-- [services/calendar_service.py](file:///c:/Users/Gopi/OneDrive/Desktop/AI%20Desktop%20Voice%20Assistant/services/calendar_service.py): OAuth2 Google Calendar API service client.
-
----
-
-## API Keys Reference
-
-| Key | Environment Variable / DB Key | Where to Get | Purpose |
-| :--- | :--- | :--- | :--- |
-| **Groq API Key** | `GROQ_API_KEY` | [console.groq.com](https://console.groq.com) | AI brain, planner, Q&A (`llama-3.3-70b-versatile`) |
-| OpenWeather Key | `OPENWEATHER_API_KEY` | [openweathermap.org](https://openweathermap.org/api) | Weather queries |
-| NewsAPI Key | `NEWS_API_KEY` | [newsapi.org](https://newsapi.org) | News headlines (RSS fallback works without key) |
-| Picovoice Key | `PICOVOICE_ACCESS_KEY` | [console.picovoice.ai](https://console.picovoice.ai) | Offline wake word detection |
-
-Set keys via `.env` file or **Web UI → Settings**.
-
----
-
-## Voice Commands Reference Cheat-Sheet
-
-```text
-1. Desktop Applications:
-   "open notepad"
-   "open chrome"
-   "open chrome profile Work"
-   "open calculator"
-   "open paint"
-   "open task manager"
-
-2. Video & Media Controls:
-   "play video" / "pause video"
-   "forward" / "seek forward"
-   "rewind" / "seek back"
-   "full screen"
-   "mute video"
-
-3. WhatsApp Automation:
-   "open whatsapp"
-   "open chat with Rahul"
-   "type message Hello how are you"
-   "send message"
-   "send whatsapp message to Rahul: Meeting at 3 PM"
-
-4. Web & YouTube Browsing:
-   "search youtube for AI tutorials"
-   "play lofi music on youtube"
-   "search google for Python scripts"
-   "open linkedin login page"
-
-5. System Info & Math:
-   "system info"
-   "what time is it"
-   "calculate 73 * 15"
-   "solve equation x**2 - 9 = 0"
+# 2. Deploy to Vercel
+vercel --prod
 ```
+- Serverless entrypoint automatically routes requests through lightweight Flask WSGI handlers without X11 or audio driver dependency errors.
 
 ---
 
-## License
+## 📱 Mobile PWA & Android Ecosystem
 
-MIT License
+1. **Install PWA**: Open the web dashboard on Chrome Mobile or Android, tap **Add to Home Screen**, and launch as a standalone application.
+2. **Permission Handshake**: On first launch, grant permissions for Microphone, Phone Calls, Contacts, and Notifications.
+3. **Hands-Free Speech Synthesis**: Metis answers queries both visually and out loud using Web Speech Synthesis API (`window.speechSynthesis`).
+
+---
+
+## 📊 Real-Time Telemetry & Monitoring
+
+Metis includes a built-in **React 18 Real-Time Monitor** mounted directly on the web interface, rendering:
+- **System Metrics**: Live CPU % & RAM % telemetry via `psutil`.
+- **Time Zone Sync**: India Standard Time (IST / `Asia/Kolkata` - UTC+5:30) date & time formatting.
+- **Database Health**: Active SQLite/MySQL error logs and connection pool status.
+
+---
+
+## 📄 License
+
+This project is open-source and released under the **MIT License**.
