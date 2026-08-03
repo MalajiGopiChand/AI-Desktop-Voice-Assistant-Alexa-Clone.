@@ -1,4 +1,5 @@
 import os
+import ctypes
 import time
 import platform
 import subprocess
@@ -59,6 +60,8 @@ class DesktopAgent(BaseAgent):
                 "screenshot": self._screenshot,
                 "switch_window": self._switch_window,
                 "close_window": self._close_window,
+                "minimize_window": self._minimize_window,
+                "reload_page": self._reload_page,
                 "open_folder": self._open_folder,
                 "move_file": self._move_file,
                 "rename_file": self._rename_file,
@@ -236,3 +239,24 @@ class DesktopAgent(BaseAgent):
     def _sleep(self, params):
         os.system("rundll32.exe powrprof.dll,SetSuspendState 0,1,0")
         return {"success": True, "message": "Entering sleep mode", "data": {}}
+
+    def _minimize_window(self, params):
+        if platform.system() == "Windows":
+            try:
+                # Win32 API: SW_MINIMIZE = 6 — most reliable method
+                user32 = ctypes.windll.user32
+                hwnd = user32.GetForegroundWindow()
+                if hwnd:
+                    user32.ShowWindow(hwnd, 6)   # 6 = SW_MINIMIZE
+                else:
+                    pyautogui.hotkey("win", "m")
+            except Exception:
+                pyautogui.hotkey("win", "m")
+        return {"success": True, "message": "Minimized active window", "data": {}}
+
+    def _reload_page(self, params):
+        try:
+            pyautogui.press("f5")       # works in browsers and most apps
+        except Exception:
+            pyautogui.hotkey("ctrl", "r")
+        return {"success": True, "message": "Reloaded page", "data": {}}

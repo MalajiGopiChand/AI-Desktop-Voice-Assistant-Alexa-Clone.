@@ -1,0 +1,33 @@
+R_DEF: Internal format may change without notice
+local
+color accent_blue
+color accent_emerald
+color accent_purple
+color bg_dark
+color card_dark
+color text_muted
+color text_white
+drawable bg_input_field
+drawable bg_mic_button
+drawable bg_send_button
+drawable bg_visor_card
+drawable ic_launcher
+id btnAction
+id btnMic
+id btnSend
+id etCommand
+id inputBar
+id ivLogo
+id tvAppTitle
+id tvStatus
+id tvStepDesc
+id tvStepTitle
+id tvSubtitle
+id visorContainer
+id visorView
+layout activity_main
+layout activity_onboarding
+string accessibility_description
+string app_name
+style Theme.MetisAI
+xml accessibility_service_config

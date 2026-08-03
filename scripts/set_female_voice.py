@@ -1,3 +1,9 @@
+try:
+    import pythoncom
+    pythoncom.CoInitialize()
+except Exception:
+    pass
+
 import pyttsx3
 from database import set_setting
 

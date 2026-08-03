@@ -81,6 +81,13 @@ class CommandProcessor:
         command = learning.resolve_semantic_phrase(raw_cmd)
         learning.record(command)
 
+        # Immediate Stop Talking / Quiet Interrupt Handlers
+        stop_triggers = ("stop talking", "stop speaking", "be quiet", "shut up", "quiet", "stop speech", "silence")
+        if command in stop_triggers or any(t in command for t in ("stop talking", "stop speaking", "be quiet", "shut up")):
+            from speech import stop_speaking
+            stop_speaking()
+            return "Stopped speaking."
+
         # Auto-learn custom commands
         learn_triggers = ("learn", "remember", "teach", "when i say")
         if any(t in command for t in learn_triggers) and len(command.split()) > 3:
@@ -93,6 +100,8 @@ class CommandProcessor:
 
         custom = self._try_custom(command)
         if custom:
+            if isinstance(custom, dict):
+                custom = custom.get("text") or custom.get("message") or str(custom)
             memory.add_context("user", command)
             memory.add_context("assistant", custom)
             save_history(command, custom[:80])
@@ -100,6 +109,8 @@ class CommandProcessor:
 
         simple = self._try_simple(command)
         if simple:
+            if isinstance(simple, dict):
+                simple = simple.get("text") or simple.get("message") or str(simple)
             memory.add_context("user", command)
             memory.add_context("assistant", simple)
             save_history(command, simple[:80])
@@ -113,9 +124,6 @@ class CommandProcessor:
             memory.add_context("assistant", response)
             save_history(command, response[:80])
             return response
-
-        if speak_callback:
-            speak_callback("Processing your request.")
 
         plan_result = planner.generate_plan(command, model=model)
         if "error" in plan_result:
@@ -266,16 +274,42 @@ class CommandProcessor:
             r = self.agents["desktop_agent"].execute("scroll", {"direction": direction})
             return r.get("message", f"Scrolled {direction}.")
 
+        # --- Window & Navigation Commands ---
+        if any(w in command for w in ("minimize", "minimize window", "minimize app", "minimise")):
+            r = self.agents["desktop_agent"].execute("minimize_window", {})
+            return r.get("message", "Minimized active window.")
+
+        if any(w in command for w in ("reload", "refresh", "reload page", "refresh page")):
+            r = self.agents["desktop_agent"].execute("reload_page", {})
+            return r.get("message", "Reloaded page.")
+
         # --- Chrome Profile & Browser Protocols ---
         if "chrome" in command and "profile" in command:
             prof = command.split("profile")[-1].strip()
             r = self.agents["desktop_agent"].execute("open_app", {"app_name": "chrome", "profile": prof})
             return r.get("message", f"Opened Chrome with profile {prof}.")
 
-        if "youtube" in command and any(w in command for w in ("search", "play", "open")):
-            query = command.replace("search youtube for", "").replace("search youtube", "").replace("play", "").replace("on youtube", "").replace("open youtube", "").strip()
-            r = self.agents["browser_agent"].execute("search", {"query": query, "engine": "youtube"})
-            return r.get("message", f"Searched YouTube for {query}.")
+        # --- YouTube Video & Song Name Auto-Play Handler ---
+        if command.startswith("play ") or "play song" in command or "play video" in command or "on youtube" in command or "youtube" in command:
+            query = (
+                command.replace("search youtube for", "")
+                .replace("search youtube", "")
+                .replace("play song", "")
+                .replace("play video", "")
+                .replace("play on youtube", "")
+                .replace("play", "")
+                .replace("on youtube", "")
+                .replace("on yt", "")
+                .strip()
+            )
+            if query and query not in ("pause", "resume", "media", "music", "next", "previous", "track"):
+                r = self.agents["browser_agent"].execute("search", {"query": query, "engine": "youtube"})
+                import threading
+                threading.Thread(target=lambda: self.agents["media_agent"].execute("auto_play_video", {}), daemon=True).start()
+                return f"Playing '{query}' on YouTube."
+            if "youtube" in command:
+                r = self.agents["browser_agent"].execute("search", {"query": query or "trending videos", "engine": "youtube"})
+                return r.get("message", "Opened YouTube.")
 
         # --- Direct Website Opening Protocols ---
         if any(w in command for w in ("netflix", "prime video", "hotstar", "jio hotstar")):
@@ -310,6 +344,20 @@ class CommandProcessor:
             r = self.agents["mobile_agent"].execute("device_status", {})
             return r.get("message", "Device status retrieved.")
 
+        # --- Ordinal YouTube Video Clicker (1st, 2nd, 3rd, 4th video) ---
+        ordinal_map = {
+            "first": 1, "1st": 1, "one": 1,
+            "second": 2, "2nd": 2, "two": 2,
+            "third": 3, "3rd": 3, "three": 3,
+            "fourth": 4, "4th": 4, "four": 4,
+            "fifth": 5, "5th": 5, "five": 5,
+        }
+        if any(w in command for w in ("video", "song", "result")) and any(o in command for o in ("first", "1st", "second", "2nd", "third", "3rd", "fourth", "4th", "fifth", "5th")):
+            for word, idx in ordinal_map.items():
+                if word in command:
+                    r = self.agents["media_agent"].execute("play_ordinal_video", {"index": idx})
+                    return f"Playing video number {idx} on screen."
+
         if (command.startswith("click on ") or command.startswith("click ")) and len(command.split()) > 1:
             target = command.replace("click on ", "").replace("click ", "").strip()
             if target not in ("left", "right", "double", "here", "mouse"):
@@ -321,7 +369,10 @@ class CommandProcessor:
         if ("date" in command or "day is it" in command) and len(command.split()) <= 6:
             return get_date()
         if any(w in command for w in ("system info", "battery", "cpu", "ram status")):
-            return system_info()
+            info = system_info()
+            if isinstance(info, dict):
+                return info.get("text", f"CPU: {info.get('cpu_percent')}%, RAM: {info.get('ram_percent')}%. {info.get('battery_status')}")
+            return info
         if any(w in command for w in ("screenshot", "volume", "mute", "copy", "paste")):
             return automate_task(command)
         if "weather" in command:
@@ -333,6 +384,15 @@ class CommandProcessor:
             if headlines:
                 return "; ".join(headlines[:5])
             return "No news available right now. Check your internet connection."
+        if any(w in command for w in ("play video", "pause video", "stop video", "resume video", "fullscreen", "full screen", "seek forward", "seek back", "fast forward", "rewind")):
+            if "fullscreen" in command or "full screen" in command:
+                return self.agents["media_agent"].execute("fullscreen", {})["message"]
+            if "forward" in command or "next" in command:
+                return self.agents["media_agent"].execute("seek_forward", {})["message"]
+            if "rewind" in command or "back" in command:
+                return self.agents["media_agent"].execute("seek_backward", {})["message"]
+            return self.agents["media_agent"].execute("play_pause", {})["message"]
+
         if any(w in command for w in ("play", "pause", "skip", "next track", "spotify")):
             if "spotify" in command and "open" in command:
                 return self.agents["media_agent"].execute("open_spotify", {})["message"]
@@ -447,7 +507,22 @@ class CommandProcessor:
                 "confirmation_required": False
             }
 
+        if any(w in raw_cmd for w in ("play video", "pause video", "play pause", "pause", "resume video", "stop video", "play music", "pause music")):
+            r = self.agents["media_agent"].execute("play_pause", {})
+            reply = r.get("message", "Toggled media playback.")
+            return {
+                "status": "success",
+                "target": "desktop",
+                "agent": "MediaAgent",
+                "action": "play_pause",
+                "params": {},
+                "spoken_reply": reply,
+                "response": reply,
+                "confirmation_required": False
+            }
+
         # Fallback to standard process pipeline
+
         text_response = self.process(command, model=model)
         return {
             "status": "success",

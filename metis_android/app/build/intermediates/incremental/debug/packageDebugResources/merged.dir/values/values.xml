@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="accent_blue">#3b82f6</color>
+    <color name="accent_emerald">#10a37f</color>
+    <color name="accent_purple">#8b5cf6</color>
+    <color name="bg_dark">#0b0f19</color>
+    <color name="card_dark">#161b26</color>
+    <color name="text_muted">#64748b</color>
+    <color name="text_white">#ffffff</color>
+    <string name="accessibility_description">METIS AI Mobile Operating System Assistant uses Accessibility Services to automate app actions (e.g. drafting WhatsApp messages, tapping buttons) per user voice requests.</string>
+    <string name="app_name">METIS AI</string>
+    <style name="Theme.MetisAI" parent="Theme.Material3.DayNight.NoActionBar">
+        
+        <item name="colorPrimary">@color/accent_emerald</item>
+        <item name="colorPrimaryVariant">@color/accent_blue</item>
+        <item name="colorOnPrimary">@color/text_white</item>
+        
+        <item name="colorSecondary">@color/accent_purple</item>
+        
+        <item name="android:statusBarColor">@color/bg_dark</item>
+        <item name="android:windowBackground">@color/bg_dark</item>
+    </style>
+</resources>

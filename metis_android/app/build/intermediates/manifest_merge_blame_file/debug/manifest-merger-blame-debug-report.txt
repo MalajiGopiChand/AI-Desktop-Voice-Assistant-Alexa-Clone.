@@ -1,0 +1,275 @@
+1<?xml version="1.0" encoding="utf-8"?>
+2<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+3    package="com.metis.agent"
+4    android:versionCode="1"
+5    android:versionName="1.0" >
+6
+7    <uses-sdk
+8        android:minSdkVersion="26"
+9        android:targetSdkVersion="34" />
+10
+11    <!-- Audio & Voice Permissions -->
+12    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+12-->C:\Users\Gopi\OneDrive\Desktop\AI Desktop Voice Assistant\metis_android\app\src\main\AndroidManifest.xml:5:5-71
+12-->C:\Users\Gopi\OneDrive\Desktop\AI Desktop Voice Assistant\metis_android\app\src\main\AndroidManifest.xml:5:22-68
+13    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+13-->C:\Users\Gopi\OneDrive\Desktop\AI Desktop Voice Assistant\metis_android\app\src\main\AndroidManifest.xml:6:5-80
+13-->C:\Users\Gopi\OneDrive\Desktop\AI Desktop Voice Assistant\metis_android\app\src\main\AndroidManifest.xml:6:22-77
+14
+15    <!-- Phone & Cellular Permissions -->
+16    <uses-permission android:name="android.permission.CALL_PHONE" />
+16-->C:\Users\Gopi\OneDrive\Desktop\AI Desktop Voice Assistant\metis_android\app\src\main\AndroidManifest.xml:9:5-69
+16-->C:\Users\Gopi\OneDrive\Desktop\AI Desktop Voice Assistant\metis_android\app\src\main\AndroidManifest.xml:9:22-66
+17    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+17-->C:\Users\Gopi\OneDrive\Desktop\AI Desktop Voice Assistant\metis_android\app\src\main\AndroidManifest.xml:10:5-75
+17-->C:\Users\Gopi\OneDrive\Desktop\AI Desktop Voice Assistant\metis_android\app\src\main\AndroidManifest.xml:10:22-72
+18
+19    <!-- Messaging & Contacts -->
+20    <uses-permission android:name="android.permission.READ_SMS" />
+20-->C:\Users\Gopi\OneDrive\Desktop\AI Desktop Voice Assistant\metis_android\app\src\main\AndroidManifest.xml:13:5-67
+20-->C:\Users\Gopi\OneDrive\Desktop\AI Desktop Voice Assistant\metis_android\app\src\main\AndroidManifest.xml:13:22-64
+21    <uses-permission android:name="android.permission.SEND_SMS" />
+21-->C:\Users\Gopi\OneDrive\Desktop\AI Desktop Voice Assistant\metis_android\app\src\main\AndroidManifest.xml:14:5-67
+21-->C:\Users\Gopi\OneDrive\Desktop\AI Desktop Voice Assistant\metis_android\app\src\main\AndroidManifest.xml:14:22-64
+22    <uses-permission android:name="android.permission.READ_CONTACTS" />
+22-->C:\Users\Gopi\OneDrive\Desktop\AI Desktop Voice Assistant\metis_android\app\src\main\AndroidManifest.xml:15:5-72
+22-->C:\Users\Gopi\OneDrive\Desktop\AI Desktop Voice Assistant\metis_android\app\src\main\AndroidManifest.xml:15:22-69
+23
+24    <!-- System & Settings Controls -->
+25    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+25-->C:\Users\Gopi\OneDrive\Desktop\AI Desktop Voice Assistant\metis_android\app\src\main\AndroidManifest.xml:18:5-79
+25-->C:\Users\Gopi\OneDrive\Desktop\AI Desktop Voice Assistant\metis_android\app\src\main\AndroidManifest.xml:18:22-76
+26    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+26-->C:\Users\Gopi\OneDrive\Desktop\AI Desktop Voice Assistant\metis_android\app\src\main\AndroidManifest.xml:19:5-81
+26-->C:\Users\Gopi\OneDrive\Desktop\AI Desktop Voice Assistant\metis_android\app\src\main\AndroidManifest.xml:19:22-78
+27    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+27-->C:\Users\Gopi\OneDrive\Desktop\AI Desktop Voice Assistant\metis_android\app\src\main\AndroidManifest.xml:20:5-77
+27-->C:\Users\Gopi\OneDrive\Desktop\AI Desktop Voice Assistant\metis_android\app\src\main\AndroidManifest.xml:20:22-74
+28    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MICROPHONE" />
+28-->C:\Users\Gopi\OneDrive\Desktop\AI Desktop Voice Assistant\metis_android\app\src\main\AndroidManifest.xml:21:5-88
+28-->C:\Users\Gopi\OneDrive\Desktop\AI Desktop Voice Assistant\metis_android\app\src\main\AndroidManifest.xml:21:22-85
+29    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+29-->C:\Users\Gopi\OneDrive\Desktop\AI Desktop Voice Assistant\metis_android\app\src\main\AndroidManifest.xml:22:5-78
+29-->C:\Users\Gopi\OneDrive\Desktop\AI Desktop Voice Assistant\metis_android\app\src\main\AndroidManifest.xml:22:22-75
+30    <uses-permission android:name="android.permission.FLASHLIGHT" />
+30-->C:\Users\Gopi\OneDrive\Desktop\AI Desktop Voice Assistant\metis_android\app\src\main\AndroidManifest.xml:23:5-69
+30-->C:\Users\Gopi\OneDrive\Desktop\AI Desktop Voice Assistant\metis_android\app\src\main\AndroidManifest.xml:23:22-66
+31    <uses-permission android:name="android.permission.CAMERA" />
+31-->C:\Users\Gopi\OneDrive\Desktop\AI Desktop Voice Assistant\metis_android\app\src\main\AndroidManifest.xml:24:5-65
+31-->C:\Users\Gopi\OneDrive\Desktop\AI Desktop Voice Assistant\metis_android\app\src\main\AndroidManifest.xml:24:22-62
+32    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+32-->C:\Users\Gopi\OneDrive\Desktop\AI Desktop Voice Assistant\metis_android\app\src\main\AndroidManifest.xml:25:5-77
+32-->C:\Users\Gopi\OneDrive\Desktop\AI Desktop Voice Assistant\metis_android\app\src\main\AndroidManifest.xml:25:22-74
+33    <uses-permission android:name="android.permission.INTERNET" />
+33-->C:\Users\Gopi\OneDrive\Desktop\AI Desktop Voice Assistant\metis_android\app\src\main\AndroidManifest.xml:26:5-67
+33-->C:\Users\Gopi\OneDrive\Desktop\AI Desktop Voice Assistant\metis_android\app\src\main\AndroidManifest.xml:26:22-64
+34    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+34-->C:\Users\Gopi\OneDrive\Desktop\AI Desktop Voice Assistant\metis_android\app\src\main\AndroidManifest.xml:27:5-79
+34-->C:\Users\Gopi\OneDrive\Desktop\AI Desktop Voice Assistant\metis_android\app\src\main\AndroidManifest.xml:27:22-76
+35    <uses-permission android:name="android.permission.SET_ALARM" />
+35-->C:\Users\Gopi\OneDrive\Desktop\AI Desktop Voice Assistant\metis_android\app\src\main\AndroidManifest.xml:28:5-68
+35-->C:\Users\Gopi\OneDrive\Desktop\AI Desktop Voice Assistant\metis_android\app\src\main\AndroidManifest.xml:28:22-65
+36    <uses-permission android:name="android.permission.VIBRATE" />
+36-->C:\Users\Gopi\OneDrive\Desktop\AI Desktop Voice Assistant\metis_android\app\src\main\AndroidManifest.xml:29:5-66
+36-->C:\Users\Gopi\OneDrive\Desktop\AI Desktop Voice Assistant\metis_android\app\src\main\AndroidManifest.xml:29:22-63
+37
+38    <queries>
+38-->C:\Users\Gopi\OneDrive\Desktop\AI Desktop Voice Assistant\metis_android\app\src\main\AndroidManifest.xml:31:5-36:15
+39        <intent>
+39-->C:\Users\Gopi\OneDrive\Desktop\AI Desktop Voice Assistant\metis_android\app\src\main\AndroidManifest.xml:32:9-35:18
+40            <action android:name="android.intent.action.MAIN" />
+40-->C:\Users\Gopi\OneDrive\Desktop\AI Desktop Voice Assistant\metis_android\app\src\main\AndroidManifest.xml:33:13-65
+40-->C:\Users\Gopi\OneDrive\Desktop\AI Desktop Voice Assistant\metis_android\app\src\main\AndroidManifest.xml:33:21-62
+41
+42            <category android:name="android.intent.category.LAUNCHER" />
+42-->C:\Users\Gopi\OneDrive\Desktop\AI Desktop Voice Assistant\metis_android\app\src\main\AndroidManifest.xml:34:13-73
+42-->C:\Users\Gopi\OneDrive\Desktop\AI Desktop Voice Assistant\metis_android\app\src\main\AndroidManifest.xml:34:23-70
+43        </intent>
+44    </queries>
+45
+46    <permission
+46-->[androidx.core:core:1.12.0] C:\Users\Gopi\AppData\Local\Temp\cursor-sandbox-cache\95e4de7a57db5efbd0fde8ee5855c6ba\gradle\caches\transforms-3\217cd4443c329c3de6d6b6409afab4f6\transformed\core-1.12.0\AndroidManifest.xml:22:5-24:47
+47        android:name="com.metis.agent.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
+47-->[androidx.core:core:1.12.0] C:\Users\Gopi\AppData\Local\Temp\cursor-sandbox-cache\95e4de7a57db5efbd0fde8ee5855c6ba\gradle\caches\transforms-3\217cd4443c329c3de6d6b6409afab4f6\transformed\core-1.12.0\AndroidManifest.xml:23:9-81
+48        android:protectionLevel="signature" />
+48-->[androidx.core:core:1.12.0] C:\Users\Gopi\AppData\Local\Temp\cursor-sandbox-cache\95e4de7a57db5efbd0fde8ee5855c6ba\gradle\caches\transforms-3\217cd4443c329c3de6d6b6409afab4f6\transformed\core-1.12.0\AndroidManifest.xml:24:9-44
+49
+50    <uses-permission android:name="com.metis.agent.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION" />
+50-->[androidx.core:core:1.12.0] C:\Users\Gopi\AppData\Local\Temp\cursor-sandbox-cache\95e4de7a57db5efbd0fde8ee5855c6ba\gradle\caches\transforms-3\217cd4443c329c3de6d6b6409afab4f6\transformed\core-1.12.0\AndroidManifest.xml:26:5-97
+50-->[androidx.core:core:1.12.0] C:\Users\Gopi\AppData\Local\Temp\cursor-sandbox-cache\95e4de7a57db5efbd0fde8ee5855c6ba\gradle\caches\transforms-3\217cd4443c329c3de6d6b6409afab4f6\transformed\core-1.12.0\AndroidManifest.xml:26:22-94
+51
+52    <application
+52-->C:\Users\Gopi\OneDrive\Desktop\AI Desktop Voice Assistant\metis_android\app\src\main\AndroidManifest.xml:38:5-95:19
+53        android:allowBackup="true"
+53-->C:\Users\Gopi\OneDrive\Desktop\AI Desktop Voice Assistant\metis_android\app\src\main\AndroidManifest.xml:39:9-35
+54        android:appComponentFactory="androidx.core.app.CoreComponentFactory"
+54-->[androidx.core:core:1.12.0] C:\Users\Gopi\AppData\Local\Temp\cursor-sandbox-cache\95e4de7a57db5efbd0fde8ee5855c6ba\gradle\caches\transforms-3\217cd4443c329c3de6d6b6409afab4f6\transformed\core-1.12.0\AndroidManifest.xml:28:18-86
+55        android:debuggable="true"
+56        android:extractNativeLibs="false"
+57        android:icon="@drawable/ic_launcher"
+57-->C:\Users\Gopi\OneDrive\Desktop\AI Desktop Voice Assistant\metis_android\app\src\main\AndroidManifest.xml:40:9-45
+58        android:label="@string/app_name"
+58-->C:\Users\Gopi\OneDrive\Desktop\AI Desktop Voice Assistant\metis_android\app\src\main\AndroidManifest.xml:41:9-41
+59        android:roundIcon="@drawable/ic_launcher"
+59-->C:\Users\Gopi\OneDrive\Desktop\AI Desktop Voice Assistant\metis_android\app\src\main\AndroidManifest.xml:42:9-50
+60        android:supportsRtl="true"
+60-->C:\Users\Gopi\OneDrive\Desktop\AI Desktop Voice Assistant\metis_android\app\src\main\AndroidManifest.xml:43:9-35
+61        android:theme="@style/Theme.MetisAI" >
+61-->C:\Users\Gopi\OneDrive\Desktop\AI Desktop Voice Assistant\metis_android\app\src\main\AndroidManifest.xml:44:9-45
+62
+63        <!-- Main Dashboard Activity -->
+64        <activity
+64-->C:\Users\Gopi\OneDrive\Desktop\AI Desktop Voice Assistant\metis_android\app\src\main\AndroidManifest.xml:47:9-55:20
+65            android:name="com.metis.agent.MainActivity"
+65-->C:\Users\Gopi\OneDrive\Desktop\AI Desktop Voice Assistant\metis_android\app\src\main\AndroidManifest.xml:48:13-41
+66            android:exported="true"
+66-->C:\Users\Gopi\OneDrive\Desktop\AI Desktop Voice Assistant\metis_android\app\src\main\AndroidManifest.xml:49:13-36
+67            android:label="METIS AI Dashboard" >
+67-->C:\Users\Gopi\OneDrive\Desktop\AI Desktop Voice Assistant\metis_android\app\src\main\AndroidManifest.xml:50:13-47
+68            <intent-filter>
+68-->C:\Users\Gopi\OneDrive\Desktop\AI Desktop Voice Assistant\metis_android\app\src\main\AndroidManifest.xml:51:13-54:29
+69                <action android:name="android.intent.action.MAIN" />
+69-->C:\Users\Gopi\OneDrive\Desktop\AI Desktop Voice Assistant\metis_android\app\src\main\AndroidManifest.xml:33:13-65
+69-->C:\Users\Gopi\OneDrive\Desktop\AI Desktop Voice Assistant\metis_android\app\src\main\AndroidManifest.xml:33:21-62
+70
+71                <category android:name="android.intent.category.LAUNCHER" />
+71-->C:\Users\Gopi\OneDrive\Desktop\AI Desktop Voice Assistant\metis_android\app\src\main\AndroidManifest.xml:34:13-73
+71-->C:\Users\Gopi\OneDrive\Desktop\AI Desktop Voice Assistant\metis_android\app\src\main\AndroidManifest.xml:34:23-70
+72            </intent-filter>
+73        </activity>
+74
+75        <!-- Onboarding & Permission Setup Wizard -->
+76        <activity
+76-->C:\Users\Gopi\OneDrive\Desktop\AI Desktop Voice Assistant\metis_android\app\src\main\AndroidManifest.xml:58:9-61:50
+77            android:name="com.metis.agent.OnboardingActivity"
+77-->C:\Users\Gopi\OneDrive\Desktop\AI Desktop Voice Assistant\metis_android\app\src\main\AndroidManifest.xml:59:13-47
+78            android:exported="false"
+78-->C:\Users\Gopi\OneDrive\Desktop\AI Desktop Voice Assistant\metis_android\app\src\main\AndroidManifest.xml:60:13-37
+79            android:label="METIS Setup Wizard" />
+79-->C:\Users\Gopi\OneDrive\Desktop\AI Desktop Voice Assistant\metis_android\app\src\main\AndroidManifest.xml:61:13-47
+80
+81        <!-- Continuous Wake Word Service ("Hey Metis") -->
+82        <service
+82-->C:\Users\Gopi\OneDrive\Desktop\AI Desktop Voice Assistant\metis_android\app\src\main\AndroidManifest.xml:64:9-68:58
+83            android:name="com.metis.agent.service.MetisWakeWordService"
+83-->C:\Users\Gopi\OneDrive\Desktop\AI Desktop Voice Assistant\metis_android\app\src\main\AndroidManifest.xml:65:13-57
+84            android:enabled="true"
+84-->C:\Users\Gopi\OneDrive\Desktop\AI Desktop Voice Assistant\metis_android\app\src\main\AndroidManifest.xml:66:13-35
+85            android:exported="false"
+85-->C:\Users\Gopi\OneDrive\Desktop\AI Desktop Voice Assistant\metis_android\app\src\main\AndroidManifest.xml:67:13-37
+86            android:foregroundServiceType="microphone" />
+86-->C:\Users\Gopi\OneDrive\Desktop\AI Desktop Voice Assistant\metis_android\app\src\main\AndroidManifest.xml:68:13-55
+87
+88        <!-- Notification Listener Service -->
+89        <service
+89-->C:\Users\Gopi\OneDrive\Desktop\AI Desktop Voice Assistant\metis_android\app\src\main\AndroidManifest.xml:71:9-79:19
+90            android:name="com.metis.agent.service.MetisNotificationListener"
+90-->C:\Users\Gopi\OneDrive\Desktop\AI Desktop Voice Assistant\metis_android\app\src\main\AndroidManifest.xml:72:13-62
+91            android:exported="true"
+91-->C:\Users\Gopi\OneDrive\Desktop\AI Desktop Voice Assistant\metis_android\app\src\main\AndroidManifest.xml:73:13-36
+92            android:label="METIS Notification Intelligence"
+92-->C:\Users\Gopi\OneDrive\Desktop\AI Desktop Voice Assistant\metis_android\app\src\main\AndroidManifest.xml:74:13-60
+93            android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE" >
+93-->C:\Users\Gopi\OneDrive\Desktop\AI Desktop Voice Assistant\metis_android\app\src\main\AndroidManifest.xml:75:13-87
+94            <intent-filter>
+94-->C:\Users\Gopi\OneDrive\Desktop\AI Desktop Voice Assistant\metis_android\app\src\main\AndroidManifest.xml:76:13-78:29
+95                <action android:name="android.service.notification.NotificationListenerService" />
+95-->C:\Users\Gopi\OneDrive\Desktop\AI Desktop Voice Assistant\metis_android\app\src\main\AndroidManifest.xml:77:17-99
+95-->C:\Users\Gopi\OneDrive\Desktop\AI Desktop Voice Assistant\metis_android\app\src\main\AndroidManifest.xml:77:25-96
+96            </intent-filter>
+97        </service>
+98
+99        <!-- Accessibility Automation Service (WhatsApp, Phone Dialer, Media) -->
+100        <service
+100-->C:\Users\Gopi\OneDrive\Desktop\AI Desktop Voice Assistant\metis_android\app\src\main\AndroidManifest.xml:82:9-93:19
+101            android:name="com.metis.agent.service.MetisAccessibilityService"
+101-->C:\Users\Gopi\OneDrive\Desktop\AI Desktop Voice Assistant\metis_android\app\src\main\AndroidManifest.xml:83:13-62
+102            android:exported="true"
+102-->C:\Users\Gopi\OneDrive\Desktop\AI Desktop Voice Assistant\metis_android\app\src\main\AndroidManifest.xml:84:13-36
+103            android:label="METIS App Automation Service"
+103-->C:\Users\Gopi\OneDrive\Desktop\AI Desktop Voice Assistant\metis_android\app\src\main\AndroidManifest.xml:85:13-57
+104            android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE" >
+104-->C:\Users\Gopi\OneDrive\Desktop\AI Desktop Voice Assistant\metis_android\app\src\main\AndroidManifest.xml:86:13-79
+105            <intent-filter>
+105-->C:\Users\Gopi\OneDrive\Desktop\AI Desktop Voice Assistant\metis_android\app\src\main\AndroidManifest.xml:87:13-89:29
+106                <action android:name="android.accessibilityservice.AccessibilityService" />
+106-->C:\Users\Gopi\OneDrive\Desktop\AI Desktop Voice Assistant\metis_android\app\src\main\AndroidManifest.xml:88:17-92
+106-->C:\Users\Gopi\OneDrive\Desktop\AI Desktop Voice Assistant\metis_android\app\src\main\AndroidManifest.xml:88:25-89
+107            </intent-filter>
+108
+109            <meta-data
+109-->C:\Users\Gopi\OneDrive\Desktop\AI Desktop Voice Assistant\metis_android\app\src\main\AndroidManifest.xml:90:13-92:72
+110                android:name="android.accessibilityservice"
+110-->C:\Users\Gopi\OneDrive\Desktop\AI Desktop Voice Assistant\metis_android\app\src\main\AndroidManifest.xml:91:17-60
+111                android:resource="@xml/accessibility_service_config" />
+111-->C:\Users\Gopi\OneDrive\Desktop\AI Desktop Voice Assistant\metis_android\app\src\main\AndroidManifest.xml:92:17-69
+112        </service>
+113
+114        <provider
+114-->[androidx.emoji2:emoji2:1.2.0] C:\Users\Gopi\AppData\Local\Temp\cursor-sandbox-cache\95e4de7a57db5efbd0fde8ee5855c6ba\gradle\caches\transforms-3\11131d099be9c123d2514ae5f1228212\transformed\jetified-emoji2-1.2.0\AndroidManifest.xml:24:9-32:20
+115            android:name="androidx.startup.InitializationProvider"
+115-->[androidx.emoji2:emoji2:1.2.0] C:\Users\Gopi\AppData\Local\Temp\cursor-sandbox-cache\95e4de7a57db5efbd0fde8ee5855c6ba\gradle\caches\transforms-3\11131d099be9c123d2514ae5f1228212\transformed\jetified-emoji2-1.2.0\AndroidManifest.xml:25:13-67
+116            android:authorities="com.metis.agent.androidx-startup"
+116-->[androidx.emoji2:emoji2:1.2.0] C:\Users\Gopi\AppData\Local\Temp\cursor-sandbox-cache\95e4de7a57db5efbd0fde8ee5855c6ba\gradle\caches\transforms-3\11131d099be9c123d2514ae5f1228212\transformed\jetified-emoji2-1.2.0\AndroidManifest.xml:26:13-68
+117            android:exported="false" >
+117-->[androidx.emoji2:emoji2:1.2.0] C:\Users\Gopi\AppData\Local\Temp\cursor-sandbox-cache\95e4de7a57db5efbd0fde8ee5855c6ba\gradle\caches\transforms-3\11131d099be9c123d2514ae5f1228212\transformed\jetified-emoji2-1.2.0\AndroidManifest.xml:27:13-37
+118            <meta-data
+118-->[androidx.emoji2:emoji2:1.2.0] C:\Users\Gopi\AppData\Local\Temp\cursor-sandbox-cache\95e4de7a57db5efbd0fde8ee5855c6ba\gradle\caches\transforms-3\11131d099be9c123d2514ae5f1228212\transformed\jetified-emoji2-1.2.0\AndroidManifest.xml:29:13-31:52
+119                android:name="androidx.emoji2.text.EmojiCompatInitializer"
+119-->[androidx.emoji2:emoji2:1.2.0] C:\Users\Gopi\AppData\Local\Temp\cursor-sandbox-cache\95e4de7a57db5efbd0fde8ee5855c6ba\gradle\caches\transforms-3\11131d099be9c123d2514ae5f1228212\transformed\jetified-emoji2-1.2.0\AndroidManifest.xml:30:17-75
+120                android:value="androidx.startup" />
+120-->[androidx.emoji2:emoji2:1.2.0] C:\Users\Gopi\AppData\Local\Temp\cursor-sandbox-cache\95e4de7a57db5efbd0fde8ee5855c6ba\gradle\caches\transforms-3\11131d099be9c123d2514ae5f1228212\transformed\jetified-emoji2-1.2.0\AndroidManifest.xml:31:17-49
+121            <meta-data
+121-->[androidx.lifecycle:lifecycle-process:2.6.1] C:\Users\Gopi\AppData\Local\Temp\cursor-sandbox-cache\95e4de7a57db5efbd0fde8ee5855c6ba\gradle\caches\transforms-3\1faaae82af36cb3649b5058de05e4cbf\transformed\jetified-lifecycle-process-2.6.1\AndroidManifest.xml:29:13-31:52
+122                android:name="androidx.lifecycle.ProcessLifecycleInitializer"
+122-->[androidx.lifecycle:lifecycle-process:2.6.1] C:\Users\Gopi\AppData\Local\Temp\cursor-sandbox-cache\95e4de7a57db5efbd0fde8ee5855c6ba\gradle\caches\transforms-3\1faaae82af36cb3649b5058de05e4cbf\transformed\jetified-lifecycle-process-2.6.1\AndroidManifest.xml:30:17-78
+123                android:value="androidx.startup" />
+123-->[androidx.lifecycle:lifecycle-process:2.6.1] C:\Users\Gopi\AppData\Local\Temp\cursor-sandbox-cache\95e4de7a57db5efbd0fde8ee5855c6ba\gradle\caches\transforms-3\1faaae82af36cb3649b5058de05e4cbf\transformed\jetified-lifecycle-process-2.6.1\AndroidManifest.xml:31:17-49
+124            <meta-data
+124-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\Gopi\AppData\Local\Temp\cursor-sandbox-cache\95e4de7a57db5efbd0fde8ee5855c6ba\gradle\caches\transforms-3\6630f9e478ec6811137c4ffff203277a\transformed\jetified-profileinstaller-1.3.0\AndroidManifest.xml:29:13-31:52
+125                android:name="androidx.profileinstaller.ProfileInstallerInitializer"
+125-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\Gopi\AppData\Local\Temp\cursor-sandbox-cache\95e4de7a57db5efbd0fde8ee5855c6ba\gradle\caches\transforms-3\6630f9e478ec6811137c4ffff203277a\transformed\jetified-profileinstaller-1.3.0\AndroidManifest.xml:30:17-85
+126                android:value="androidx.startup" />
+126-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\Gopi\AppData\Local\Temp\cursor-sandbox-cache\95e4de7a57db5efbd0fde8ee5855c6ba\gradle\caches\transforms-3\6630f9e478ec6811137c4ffff203277a\transformed\jetified-profileinstaller-1.3.0\AndroidManifest.xml:31:17-49
+127        </provider>
+128
+129        <receiver
+129-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\Gopi\AppData\Local\Temp\cursor-sandbox-cache\95e4de7a57db5efbd0fde8ee5855c6ba\gradle\caches\transforms-3\6630f9e478ec6811137c4ffff203277a\transformed\jetified-profileinstaller-1.3.0\AndroidManifest.xml:34:9-52:20
+130            android:name="androidx.profileinstaller.ProfileInstallReceiver"
+130-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\Gopi\AppData\Local\Temp\cursor-sandbox-cache\95e4de7a57db5efbd0fde8ee5855c6ba\gradle\caches\transforms-3\6630f9e478ec6811137c4ffff203277a\transformed\jetified-profileinstaller-1.3.0\AndroidManifest.xml:35:13-76
+131            android:directBootAware="false"
+131-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\Gopi\AppData\Local\Temp\cursor-sandbox-cache\95e4de7a57db5efbd0fde8ee5855c6ba\gradle\caches\transforms-3\6630f9e478ec6811137c4ffff203277a\transformed\jetified-profileinstaller-1.3.0\AndroidManifest.xml:36:13-44
+132            android:enabled="true"
+132-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\Gopi\AppData\Local\Temp\cursor-sandbox-cache\95e4de7a57db5efbd0fde8ee5855c6ba\gradle\caches\transforms-3\6630f9e478ec6811137c4ffff203277a\transformed\jetified-profileinstaller-1.3.0\AndroidManifest.xml:37:13-35
+133            android:exported="true"
+133-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\Gopi\AppData\Local\Temp\cursor-sandbox-cache\95e4de7a57db5efbd0fde8ee5855c6ba\gradle\caches\transforms-3\6630f9e478ec6811137c4ffff203277a\transformed\jetified-profileinstaller-1.3.0\AndroidManifest.xml:38:13-36
+134            android:permission="android.permission.DUMP" >
+134-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\Gopi\AppData\Local\Temp\cursor-sandbox-cache\95e4de7a57db5efbd0fde8ee5855c6ba\gradle\caches\transforms-3\6630f9e478ec6811137c4ffff203277a\transformed\jetified-profileinstaller-1.3.0\AndroidManifest.xml:39:13-57
+135            <intent-filter>
+135-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\Gopi\AppData\Local\Temp\cursor-sandbox-cache\95e4de7a57db5efbd0fde8ee5855c6ba\gradle\caches\transforms-3\6630f9e478ec6811137c4ffff203277a\transformed\jetified-profileinstaller-1.3.0\AndroidManifest.xml:40:13-42:29
+136                <action android:name="androidx.profileinstaller.action.INSTALL_PROFILE" />
+136-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\Gopi\AppData\Local\Temp\cursor-sandbox-cache\95e4de7a57db5efbd0fde8ee5855c6ba\gradle\caches\transforms-3\6630f9e478ec6811137c4ffff203277a\transformed\jetified-profileinstaller-1.3.0\AndroidManifest.xml:41:17-91
+136-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\Gopi\AppData\Local\Temp\cursor-sandbox-cache\95e4de7a57db5efbd0fde8ee5855c6ba\gradle\caches\transforms-3\6630f9e478ec6811137c4ffff203277a\transformed\jetified-profileinstaller-1.3.0\AndroidManifest.xml:41:25-88
+137            </intent-filter>
+138            <intent-filter>
+138-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\Gopi\AppData\Local\Temp\cursor-sandbox-cache\95e4de7a57db5efbd0fde8ee5855c6ba\gradle\caches\transforms-3\6630f9e478ec6811137c4ffff203277a\transformed\jetified-profileinstaller-1.3.0\AndroidManifest.xml:43:13-45:29
+139                <action android:name="androidx.profileinstaller.action.SKIP_FILE" />
+139-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\Gopi\AppData\Local\Temp\cursor-sandbox-cache\95e4de7a57db5efbd0fde8ee5855c6ba\gradle\caches\transforms-3\6630f9e478ec6811137c4ffff203277a\transformed\jetified-profileinstaller-1.3.0\AndroidManifest.xml:44:17-85
+139-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\Gopi\AppData\Local\Temp\cursor-sandbox-cache\95e4de7a57db5efbd0fde8ee5855c6ba\gradle\caches\transforms-3\6630f9e478ec6811137c4ffff203277a\transformed\jetified-profileinstaller-1.3.0\AndroidManifest.xml:44:25-82
+140            </intent-filter>
+141            <intent-filter>
+141-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\Gopi\AppData\Local\Temp\cursor-sandbox-cache\95e4de7a57db5efbd0fde8ee5855c6ba\gradle\caches\transforms-3\6630f9e478ec6811137c4ffff203277a\transformed\jetified-profileinstaller-1.3.0\AndroidManifest.xml:46:13-48:29
+142                <action android:name="androidx.profileinstaller.action.SAVE_PROFILE" />
+142-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\Gopi\AppData\Local\Temp\cursor-sandbox-cache\95e4de7a57db5efbd0fde8ee5855c6ba\gradle\caches\transforms-3\6630f9e478ec6811137c4ffff203277a\transformed\jetified-profileinstaller-1.3.0\AndroidManifest.xml:47:17-88
+142-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\Gopi\AppData\Local\Temp\cursor-sandbox-cache\95e4de7a57db5efbd0fde8ee5855c6ba\gradle\caches\transforms-3\6630f9e478ec6811137c4ffff203277a\transformed\jetified-profileinstaller-1.3.0\AndroidManifest.xml:47:25-85
+143            </intent-filter>
+144            <intent-filter>
+144-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\Gopi\AppData\Local\Temp\cursor-sandbox-cache\95e4de7a57db5efbd0fde8ee5855c6ba\gradle\caches\transforms-3\6630f9e478ec6811137c4ffff203277a\transformed\jetified-profileinstaller-1.3.0\AndroidManifest.xml:49:13-51:29
+145                <action android:name="androidx.profileinstaller.action.BENCHMARK_OPERATION" />
+145-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\Gopi\AppData\Local\Temp\cursor-sandbox-cache\95e4de7a57db5efbd0fde8ee5855c6ba\gradle\caches\transforms-3\6630f9e478ec6811137c4ffff203277a\transformed\jetified-profileinstaller-1.3.0\AndroidManifest.xml:50:17-95
+145-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\Gopi\AppData\Local\Temp\cursor-sandbox-cache\95e4de7a57db5efbd0fde8ee5855c6ba\gradle\caches\transforms-3\6630f9e478ec6811137c4ffff203277a\transformed\jetified-profileinstaller-1.3.0\AndroidManifest.xml:50:25-92
+146            </intent-filter>
+147        </receiver>
+148    </application>
+149
+150</manifest>

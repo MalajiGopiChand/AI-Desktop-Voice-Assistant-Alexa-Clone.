@@ -61,7 +61,7 @@ def get_time_greeting(name="Gopi"):
         period = "Good evening"
     else:
         period = "Good night"
-    return f"{period} Master {name}! Metis is online in India Standard Time."
+    return f"{period} Master {name}! Metis is online and ready."
 
 
 def get_time():

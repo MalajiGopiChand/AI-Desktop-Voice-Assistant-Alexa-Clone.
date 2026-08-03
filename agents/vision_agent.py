@@ -1,6 +1,6 @@
 import os
+import glob
 import time
-from PIL import Image
 from agents.base_agent import BaseAgent
 from core.llm_client import chat, FAST_MODEL
 
@@ -10,6 +10,32 @@ try:
 except Exception:
     pyautogui = None
 
+try:
+    from PIL import Image
+    PIL_AVAILABLE = True
+except Exception:
+    PIL_AVAILABLE = False
+
+# Directory where captures are saved (root of project)
+_CAPTURE_DIR = os.path.dirname(os.path.abspath(__file__))
+_CAPTURE_DIR = os.path.join(_CAPTURE_DIR, "..")   # one level up → project root
+
+
+def _cleanup_old_captures(keep_last=3):
+    """Delete old vision_capture_*.png files, keeping only the N most recent."""
+    try:
+        root = os.path.dirname(os.path.abspath(__file__))
+        root = os.path.normpath(os.path.join(root, ".."))
+        pattern = os.path.join(root, "vision_capture_*.png")
+        files = sorted(glob.glob(pattern))
+        for old in files[:-keep_last]:
+            try:
+                os.remove(old)
+            except Exception:
+                pass
+    except Exception:
+        pass
+
 
 class VisionAgent(BaseAgent):
     def __init__(self):
@@ -18,11 +44,11 @@ class VisionAgent(BaseAgent):
     def execute(self, action, params):
         try:
             handlers = {
-                "screenshot": self._screenshot,
-                "read_screen": self._read_screen,
-                "ocr_region": self._ocr_region,
-                "describe_screen": self._describe_screen,
-                "click_target": self._click_target,
+                "screenshot":       self._screenshot,
+                "read_screen":      self._read_screen,
+                "ocr_region":       self._ocr_region,
+                "describe_screen":  self._describe_screen,
+                "click_target":     self._click_target,
             }
             handler = handlers.get(action)
             if not handler:
@@ -32,61 +58,76 @@ class VisionAgent(BaseAgent):
             return {"success": False, "message": str(e), "data": {}}
 
     def _capture(self):
-        path = f"vision_capture_{int(time.time())}.png"
-        pyautogui.screenshot(path)
+        """Take a screenshot, save to project root, clean up old ones."""
+        root = os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
+        path = os.path.join(root, f"vision_capture_{int(time.time())}.png")
+        if pyautogui:
+            pyautogui.screenshot(path)
+        _cleanup_old_captures(keep_last=3)
         return path
 
     def _ocr(self, image_path):
+        """Run OCR on saved screenshot — always close the PIL Image after use."""
+        if not PIL_AVAILABLE:
+            return ""
         try:
             import pytesseract
-            text = pytesseract.image_to_string(Image.open(image_path))
+            img = Image.open(image_path)
+            try:
+                text = pytesseract.image_to_string(img)
+            finally:
+                img.close()          # ← fix: always close
             return text.strip()
-        except Exception:
+        except Exception as e:
+            print(f"OCR notice: {e}")
             return ""
 
     def find_and_click_element(self, target_name):
+        """Find target text on screen via OCR and click it; fallback to centre."""
         target_name = (target_name or "").lower().strip()
         path = self._capture()
-        try:
-            import pytesseract
-            img = Image.open(path)
-            data = pytesseract.image_to_data(img, output_type=pytesseract.Output.DICT)
-            n_boxes = len(data.get("text", []))
 
-            best_match = None
-            for i in range(n_boxes):
-                word = (data["text"][i] or "").lower().strip()
-                if not word or len(word) < 2:
-                    continue
-                if target_name in word or word in target_name:
-                    x = data["left"][i] + data["width"][i] // 2
-                    y = data["top"][i] + data["height"][i] // 2
-                    best_match = (x, y, word)
-                    break
+        # Try OCR-based location
+        if PIL_AVAILABLE:
+            try:
+                import pytesseract
+                img = Image.open(path)
+                try:
+                    data = pytesseract.image_to_data(img, output_type=pytesseract.Output.DICT)
+                finally:
+                    img.close()          # ← fix: always close
 
-            if best_match:
-                x, y, matched_word = best_match
-                pyautogui.moveTo(x, y, duration=0.3)
-                pyautogui.click(x, y)
-                return {
-                    "success": True,
-                    "message": f"Located '{matched_word}' on screen. Moved mouse to ({x}, {y}) and clicked.",
-                    "data": {"x": x, "y": y, "target": matched_word},
-                }
+                n_boxes = len(data.get("text", []))
+                for i in range(n_boxes):
+                    word = (data["text"][i] or "").lower().strip()
+                    if not word or len(word) < 2:
+                        continue
+                    if target_name in word or word in target_name:
+                        x = data["left"][i] + data["width"][i] // 2
+                        y = data["top"][i] + data["height"][i] // 2
+                        if pyautogui:
+                            pyautogui.moveTo(x, y, duration=0.25)
+                            pyautogui.click(x, y)
+                        return {
+                            "success": True,
+                            "message": f"Located '{word}' on screen and clicked ({x}, {y}).",
+                            "data": {"x": x, "y": y, "target": word},
+                        }
+            except Exception as e:
+                print(f"OCR Target search notice: {e}")
 
-        except Exception as e:
-            print(f"OCR Target search notice: {e}")
-
-        # Smart Fallback: Position mouse at center of active window and click
-        screen_w, screen_h = pyautogui.size()
-        cx, cy = screen_w // 2, screen_h // 2
-        pyautogui.moveTo(cx, cy, duration=0.3)
-        pyautogui.click(cx, cy)
-        return {
-            "success": True,
-            "message": f"Target '{target_name}' clicked at screen position ({cx}, {cy}).",
-            "data": {"x": cx, "y": cy},
-        }
+        # Fallback: click centre of screen
+        if pyautogui:
+            sw, sh = pyautogui.size()
+            cx, cy = sw // 2, sh // 2
+            pyautogui.moveTo(cx, cy, duration=0.25)
+            pyautogui.click(cx, cy)
+            return {
+                "success": True,
+                "message": f"Could not locate '{target_name}' via OCR. Clicked screen centre.",
+                "data": {"x": cx, "y": cy},
+            }
+        return {"success": False, "message": "pyautogui not available.", "data": {}}
 
     def _click_target(self, params):
         target = params.get("target", params.get("element", params.get("name", "")))
@@ -94,7 +135,7 @@ class VisionAgent(BaseAgent):
 
     def _screenshot(self, params):
         path = self._capture()
-        return {"success": True, "message": f"Captured screen to {path}", "data": {"path": path}}
+        return {"success": True, "message": f"Screenshot saved to {path}", "data": {"path": path}}
 
     def _read_screen(self, params):
         path = self._capture()
@@ -102,18 +143,14 @@ class VisionAgent(BaseAgent):
         if text:
             summary = chat(
                 [
-                    {"role": "system", "content": "Summarize visible screen text for the user."},
-                    {"role": "user", "content": text[:5000]},
+                    {"role": "system", "content": "Summarize visible screen text briefly for the user."},
+                    {"role": "user",   "content": text[:5000]},
                 ],
                 model=FAST_MODEL,
                 max_tokens=200,
             )
             return {"success": True, "message": summary, "data": {"text": text, "summary": summary}}
-        return {
-            "success": True,
-            "message": "Screenshot taken.",
-            "data": {"path": path},
-        }
+        return {"success": True, "message": "Screenshot taken but no text detected.", "data": {"path": path}}
 
     def _ocr_region(self, params):
         path = self._capture()
@@ -127,10 +164,10 @@ class VisionAgent(BaseAgent):
             desc = chat(
                 [
                     {"role": "system", "content": "Describe what the user is likely looking at based on OCR text."},
-                    {"role": "user", "content": text[:4000]},
+                    {"role": "user",   "content": text[:4000]},
                 ],
                 model=FAST_MODEL,
                 max_tokens=200,
             )
             return {"success": True, "message": desc, "data": {"description": desc}}
-        return {"success": True, "message": "Captured screen.", "data": {"path": path}}
+        return {"success": True, "message": "Screen captured — no readable text found.", "data": {"path": path}}

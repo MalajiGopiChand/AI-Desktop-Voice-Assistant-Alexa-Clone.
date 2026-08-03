@@ -6,7 +6,7 @@ from core.memory import memory
 SYSTEM_PROMPT = """You are Metis, an intelligent desktop AI operating system.
 You help the user with conversations, reasoning, coding, research, and desktop tasks.
 Be concise — responses may be spoken aloud via text-to-speech.
-When you lack live data, say so honestly.
+CRITICAL RULE: Do NOT include or state the current date, day, or time in your response UNLESS the user explicitly asks for the date, day, or time in their request.
 Never store or ask for passwords."""
 
 
@@ -28,7 +28,7 @@ class Brain:
         news_str = "; ".join(live_news_items) if live_news_items else "No live news feeds loaded."
 
         realtime_context = (
-            f"\n--- REAL-TIME LIVE DATA ---\n"
+            f"\n--- REAL-TIME LIVE DATA (Reference Only — Output date/time ONLY if asked) ---\n"
             f"Current Real-Time Date & Time: {current_time_str}\n"
             f"Live Weather: {live_weather}\n"
             f"Live News Headlines: {news_str}\n"
@@ -48,18 +48,9 @@ class Brain:
     def classify_intent(self, user_message):
         """Returns 'simple', 'complex', or 'conversation'."""
         lower = user_message.lower()
-        complex_triggers = [
-            "then", "after", "first", "next", "open chrome", "send message",
-            "send email", "whatsapp", "search for", "apply for", "summarize",
-            "take screenshot", "read screen", "create", "automate",
-            "weather", "calendar", "schedule", "analyze", "chart", "pdf",
-            "excel", "word", "organize", "duplicate", "remind",
-        ]
-        simple_triggers = ["time", "date", "battery", "system info", "volume", "mute"]
-
-        if any(t in lower for t in simple_triggers) and len(lower.split()) < 8:
-            return "simple"
-        if any(t in lower for t in complex_triggers) or len(lower.split()) > 6:
+        multi_step_triggers = ["then", "and after that", "first ", "step 1", "next "]
+        
+        if any(t in lower for t in multi_step_triggers):
             return "complex"
         return "conversation"
 

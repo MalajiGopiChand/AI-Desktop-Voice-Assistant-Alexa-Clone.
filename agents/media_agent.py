@@ -15,26 +15,65 @@ class MediaAgent(BaseAgent):
 
             def _play_pause():
                 try:
-                    keyboard.send("play/pause media")
+                    pyautogui.press("playpause")
                 except Exception:
                     pass
-                pyautogui.press("playpause")
-                pyautogui.press("k")
+                try:
+                    pyautogui.press("k")
+                except Exception:
+                    pass
+
 
             def _seek_forward():
-                pyautogui.press("l")
-                pyautogui.press("right")
+                try:
+                    pyautogui.press("l")
+                    pyautogui.press("right")
+                except Exception:
+                    pass
 
             def _seek_backward():
-                pyautogui.press("j")
-                pyautogui.press("left")
+                try:
+                    pyautogui.press("j")
+                    pyautogui.press("left")
+                except Exception:
+                    pass
 
             def _fullscreen():
-                pyautogui.press("f")
+                try:
+                    pyautogui.press("f")
+                except Exception:
+                    pass
 
             def _mute():
-                pyautogui.press("m")
-                pyautogui.press("volumemute")
+                try:
+                    pyautogui.press("m")
+                except Exception:
+                    pass
+
+            def _auto_click_first_video():
+                import time
+                time.sleep(2.0)
+                try:
+                    screen_w, screen_h = pyautogui.size()
+                    pyautogui.click(screen_w // 2, int(screen_h * 0.35))
+                    time.sleep(0.5)
+                    pyautogui.press("k")
+                except Exception:
+                    pass
+
+            def _play_ordinal_video(params):
+                import time
+                try:
+                    idx = int(params.get("index", 1))
+                    screen_w, screen_h = pyautogui.size()
+                    y_ratios = {1: 0.35, 2: 0.50, 3: 0.65, 4: 0.80, 5: 0.90}
+                    y_pos = int(screen_h * y_ratios.get(idx, 0.35))
+                    x_pos = screen_w // 2
+                    pyautogui.click(x_pos, y_pos)
+                    time.sleep(0.5)
+                    pyautogui.press("k")
+                except Exception:
+                    pass
 
             actions = {
                 "play_pause": _play_pause,
@@ -45,6 +84,8 @@ class MediaAgent(BaseAgent):
                 "seek_backward": _seek_backward,
                 "fullscreen": _fullscreen,
                 "mute_video": _mute,
+                "auto_play_video": _auto_click_first_video,
+                "play_ordinal_video": lambda: _play_ordinal_video(params),
                 "next_track": lambda: [pyautogui.press("nexttrack"), pyautogui.hotkey("shift", "n")],
                 "previous_track": lambda: pyautogui.press("prevtrack"),
                 "volume_up": lambda: [pyautogui.press("volumeup") for _ in range(3)],

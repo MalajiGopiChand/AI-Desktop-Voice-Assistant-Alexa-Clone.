@@ -5,13 +5,13 @@ import requests
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-DEFAULT_GROQ_MODEL = "llama-3.3-70b-versatile"
+DEFAULT_GROQ_MODEL = "llama-3.1-8b-instant"
 FAST_GROQ_MODEL = "llama-3.1-8b-instant"
 
-DEFAULT_MISTRAL_MODEL = "mistral-large-latest"
+DEFAULT_MISTRAL_MODEL = "mistral-small-latest"
 FAST_MISTRAL_MODEL = "mistral-small-latest"
 
-DEFAULT_MODEL = DEFAULT_GROQ_MODEL
+DEFAULT_MODEL = FAST_GROQ_MODEL
 FAST_MODEL = FAST_GROQ_MODEL
 
 

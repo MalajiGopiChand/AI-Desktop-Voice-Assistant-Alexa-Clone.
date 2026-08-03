@@ -1,0 +1,34 @@
+[
+    {
+        "merged": "com.metis.agent.app-debug-31:/drawable_bg_mic_button.xml.flat",
+        "source": "com.metis.agent.app-main-33:/drawable/bg_mic_button.xml"
+    },
+    {
+        "merged": "com.metis.agent.app-debug-31:/layout_activity_onboarding.xml.flat",
+        "source": "com.metis.agent.app-main-33:/layout/activity_onboarding.xml"
+    },
+    {
+        "merged": "com.metis.agent.app-debug-31:/drawable_bg_input_field.xml.flat",
+        "source": "com.metis.agent.app-main-33:/drawable/bg_input_field.xml"
+    },
+    {
+        "merged": "com.metis.agent.app-debug-31:/drawable_bg_visor_card.xml.flat",
+        "source": "com.metis.agent.app-main-33:/drawable/bg_visor_card.xml"
+    },
+    {
+        "merged": "com.metis.agent.app-debug-31:/xml_accessibility_service_config.xml.flat",
+        "source": "com.metis.agent.app-main-33:/xml/accessibility_service_config.xml"
+    },
+    {
+        "merged": "com.metis.agent.app-debug-31:/drawable_bg_send_button.xml.flat",
+        "source": "com.metis.agent.app-main-33:/drawable/bg_send_button.xml"
+    },
+    {
+        "merged": "com.metis.agent.app-debug-31:/drawable_ic_launcher.xml.flat",
+        "source": "com.metis.agent.app-main-33:/drawable/ic_launcher.xml"
+    },
+    {
+        "merged": "com.metis.agent.app-debug-31:/layout_activity_main.xml.flat",
+        "source": "com.metis.agent.app-main-33:/layout/activity_main.xml"
+    }
+]

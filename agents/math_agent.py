@@ -26,7 +26,15 @@ class MathAgent(BaseAgent):
             return {"success": False, "message": str(e), "data": {}}
 
     def _calculate(self, params):
-        expr = params.get("expression", "").replace("^", "**")
+        expr = params.get("expression", "")
+        # Normalize spoken math operators
+        expr = expr.replace("^", "**").replace("×", "*").replace("÷", "/")
+        expr = re.sub(r'\bmultiplied by\b', '*', expr, flags=re.I)
+        expr = re.sub(r'\btimes\b', '*', expr, flags=re.I)
+        expr = re.sub(r'\binto\b', '*', expr, flags=re.I)
+        expr = re.sub(r'\bdivided by\b', '/', expr, flags=re.I)
+        expr = re.sub(r'(\d+)\s*[xX]\s*(\d+)', r'\1 * \2', expr)
+
         try:
             import sympy as sp
             result = sp.sympify(expr)
@@ -35,6 +43,7 @@ class MathAgent(BaseAgent):
                 return {"success": True, "message": f"The result is {val:g}", "data": {"result": val}}
         except Exception:
             pass
+
         import math
         safe = {"sqrt": math.sqrt, "sin": math.sin, "cos": math.cos, "tan": math.tan,
                 "log": math.log, "pi": math.pi, "e": math.e, "abs": abs, "pow": pow}

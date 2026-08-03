@@ -1,6 +1,7 @@
 package com.metis.agent
 
 import android.Manifest
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
@@ -14,12 +15,12 @@ import androidx.core.content.ContextCompat
 
 class OnboardingActivity : AppCompatActivity() {
 
-    private var currentStep = 0
+    private var currentStep: Int = 0
     private lateinit var stepTitle: TextView
     private lateinit var stepDescription: TextView
     private lateinit var actionButton: Button
 
-    private val permissionSteps = listOf(
+    private val permissionSteps: List<PermissionStep> = listOf(
         PermissionStep(
             title = "Welcome to METIS AI OS",
             description = "METIS transforms your phone into an AI-powered voice operating system. Let's calibrate your device permissions.",
@@ -72,9 +73,10 @@ class OnboardingActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_onboarding)
 
-        stepTitle = findViewById(R.id.tvStepTitle)
-        stepDescription = findViewById(R.id.tvStepDesc)
-        actionButton = findViewById(R.id.btnAction)
+        // Explicit Type Parameters for findViewById<T>
+        stepTitle = findViewById<TextView>(R.id.tvStepTitle)
+        stepDescription = findViewById<TextView>(R.id.tvStepDesc)
+        actionButton = findViewById<Button>(R.id.btnAction)
 
         updateStepUI()
 
@@ -84,7 +86,7 @@ class OnboardingActivity : AppCompatActivity() {
     }
 
     private fun updateStepUI() {
-        val step = permissionSteps[currentStep]
+        val step: PermissionStep = permissionSteps[currentStep]
         stepTitle.text = step.title
         stepDescription.text = step.description
 
@@ -97,7 +99,8 @@ class OnboardingActivity : AppCompatActivity() {
     }
 
     private fun handleStepAction() {
-        val step = permissionSteps[currentStep]
+        val step: PermissionStep = permissionSteps[currentStep]
+        val ctx: Context = this
 
         when (step.permission) {
             null -> advanceStep()
@@ -110,12 +113,13 @@ class OnboardingActivity : AppCompatActivity() {
                 advanceStep()
             }
             "WAKE_WORD_CALIBRATION" -> {
-                Toast.makeText(this, "Calibration complete! METIS is ready.", Toast.LENGTH_SHORT).show()
+                Toast.makeText(ctx, "Calibration complete! METIS is ready.", Toast.LENGTH_SHORT).show()
                 finishOnboarding()
             }
             else -> {
-                if (ContextCompat.checkSelfPermission(this, step.permission) != PackageManager.PERMISSION_GRANTED) {
-                    ActivityCompat.requestPermissions(this, arrayOf(step.permission), 101)
+                val permStr: String = step.permission
+                if (ContextCompat.checkSelfPermission(ctx, permStr) != PackageManager.PERMISSION_GRANTED) {
+                    ActivityCompat.requestPermissions(this, arrayOf(permStr), 101)
                 } else {
                     advanceStep()
                 }

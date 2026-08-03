@@ -1,18 +1,16 @@
 package com.metis.agent.visor
 
+import android.animation.ValueAnimator
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 import android.util.AttributeSet
 import android.view.View
+import android.view.animation.LinearInterpolator
 
 /**
  * Animated Cyberpunk Visor View for METIS AI.
- * Visor States:
- *  - IDLE:       [ ⊙ ‿ ⊙ ]
- *  - PROCESSING: [ ⚡ ‿ ⚡ ]
- *  - SPEAKING:   [ 💬 ‿ 💬 ]
  */
 class VisorView @JvmOverloads constructor(
     context: Context,
@@ -27,23 +25,37 @@ class VisorView @JvmOverloads constructor(
     }
 
     private var currentState: VisorState = VisorState.IDLE
+    private var phase = 0f
+
     private val textPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        color = Color.parseColor("#10a37f")
-        textSize = 54f
+        color = Color.parseColor(VisorState.IDLE.colorHex)
+        textSize = 48f
         textAlign = Paint.Align.CENTER
         isFakeBoldText = true
     }
 
     private val wavePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        color = Color.parseColor("#10a37f")
-        strokeWidth = 6f
+        color = Color.parseColor(VisorState.IDLE.colorHex)
+        strokeWidth = 5f
         style = Paint.Style.STROKE
     }
 
-    private var phase = 0f
+    private val pulseAnimator = ValueAnimator.ofFloat(0f, (Math.PI * 2).toFloat()).apply {
+        duration = 2000L
+        repeatCount = ValueAnimator.INFINITE
+        interpolator = LinearInterpolator()
+        addUpdateListener { animator ->
+            phase = animator.animatedValue as Float
+            invalidate()
+        }
+    }
+
+    init {
+        pulseAnimator.start()
+    }
 
     fun setState(state: VisorState) {
-        this.currentState = state
+        currentState = state
         textPaint.color = Color.parseColor(state.colorHex)
         wavePaint.color = Color.parseColor(state.colorHex)
         invalidate()
@@ -54,14 +66,14 @@ class VisorView @JvmOverloads constructor(
         val cx = width / 2f
         val cy = height / 2f
 
-        // Draw Visor Text State
-        canvas.drawText(currentState.asciiRepresentation, cx, cy - 20f, textPaint)
+        canvas.drawText(currentState.asciiRepresentation, cx, cy - 10f, textPaint)
 
-        // Draw Animated Waveform Ring
-        phase += 0.1f
-        val radius = 120f + (Math.sin(phase.toDouble()).toFloat() * 15f)
+        val radius = 100f + (Math.sin(phase.toDouble()).toFloat() * 12f)
         canvas.drawCircle(cx, cy, radius, wavePaint)
+    }
 
-        invalidate()
+    override fun onDetachedFromWindow() {
+        pulseAnimator.cancel()
+        super.onDetachedFromWindow()
     }
 }

@@ -47,16 +47,18 @@ ASSISTANT_CITY = os.environ.get("JARVIS_CITY", os.environ.get("METIS_CITY", "Mum
 
 # Wake words
 WAKE_WORDS = ["metis", "hello metis", "hey metis"]
+WAKE_WORD = "metis"
+ALT_WAKE_WORD = "hey metis"
 REQUIRE_WAKE_WORD = os.environ.get("REQUIRE_WAKE_WORD", "false").lower() == "true"
 USE_PORCUPINE_WAKE_WORD = os.environ.get("USE_PORCUPINE", "false").lower() == "true"
 SHOW_DESKTOP_WIDGET = os.environ.get("SHOW_DESKTOP_WIDGET", "true").lower() == "true"
 
-# Voice
-VOICE_RATE = 165
+# Voice & Timers
+VOICE_RATE = 185
 VOICE_VOLUME = 1.0
 VOICE_INDEX = 1
-LISTEN_TIMEOUT = 5
-PHRASE_TIME_LIMIT = 12
+LISTEN_TIMEOUT = 4
+PHRASE_TIME_LIMIT = 8
 
 # Storage
 DATABASE_PATH = os.environ.get(

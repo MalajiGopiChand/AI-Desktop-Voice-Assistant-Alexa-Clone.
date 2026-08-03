@@ -37,7 +37,7 @@ class MetisAccessibilityService : AccessibilityService() {
         val textInputNodes = rootNode.findAccessibilityNodeInfosByText("Type a message")
         if (textInputNodes.isNotEmpty()) {
             val arguments = Bundle().apply {
-                putCharSequence(AccessibilityNodeInfo.ACTION_ARGUMENT_SET_TEXT_STRING, messageText)
+                putCharSequence(AccessibilityNodeInfo.ACTION_ARGUMENT_SET_TEXT_CHARSEQUENCE, messageText)
             }
             textInputNodes[0].performAction(AccessibilityNodeInfo.ACTION_SET_TEXT, arguments)
             return true

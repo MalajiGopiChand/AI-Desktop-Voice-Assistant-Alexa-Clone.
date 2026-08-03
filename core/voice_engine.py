@@ -18,8 +18,17 @@ class VoiceEngine:
         self._worker_thread.start()
 
     def _tts_worker(self):
-        self.engine_ref = pyttsx3.init()
-        self.engine_ref.setProperty("rate", 165)
+        try:
+            import pythoncom
+            pythoncom.CoInitialize()
+        except Exception:
+            pass
+        try:
+            self.engine_ref = pyttsx3.init()
+            self.engine_ref.setProperty("rate", 165)
+        except Exception as e:
+            print(f"VoiceEngine pyttsx3 init error: {e}")
+            self.engine_ref = None
         while True:
             text = self.tts_queue.get()
             if text is None:

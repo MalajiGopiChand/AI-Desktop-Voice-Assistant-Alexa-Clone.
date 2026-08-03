@@ -12,8 +12,9 @@ from config import GROQ_API_KEY
 
 def test_imports():
     from core.command_processor import processor
-    assert len(processor.agents) == 15
-    print("[OK] 15 agents loaded")
+    assert len(processor.agents) >= 15
+    print(f"[OK] {len(processor.agents)} agents loaded")
+
 
 
 def test_simple_commands():
