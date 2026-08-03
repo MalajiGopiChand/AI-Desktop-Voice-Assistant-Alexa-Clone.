@@ -1,6 +1,8 @@
 import os
 import glob
 import time
+import platform
+import subprocess
 from agents.base_agent import BaseAgent
 from core.llm_client import chat, FAST_MODEL
 
@@ -61,26 +63,72 @@ class VisionAgent(BaseAgent):
         """Take a screenshot, save to project root, clean up old ones."""
         root = os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
         path = os.path.join(root, f"vision_capture_{int(time.time())}.png")
+        saved = False
+
         if pyautogui:
-            pyautogui.screenshot(path)
+            try:
+                pyautogui.screenshot(path)
+                saved = os.path.exists(path) and os.path.getsize(path) > 0
+            except Exception:
+                saved = False
+
+        if not saved:
+            try:
+                from PIL import ImageGrab
+                shot = ImageGrab.grab()
+                shot.save(path)
+                saved = os.path.exists(path) and os.path.getsize(path) > 0
+            except Exception:
+                saved = False
+
+        if not saved and platform.system() == "Windows":
+            try:
+                ps = (
+                    f'[Reflection.Assembly]::LoadWithPartialName("System.Drawing"); '
+                    f'[Reflection.Assembly]::LoadWithPartialName("System.Windows.Forms"); '
+                    f'$b = [System.Windows.Forms.Screen]::PrimaryScreen.Bounds; '
+                    f'$bmp = New-Object System.Drawing.Bitmap $b.Width, $b.Height; '
+                    f'$g = [System.Drawing.Graphics]::FromImage($bmp); '
+                    f'$g.CopyFromScreen($b.Location, [System.Drawing.Point]::Empty, $b.Size); '
+                    f'$bmp.Save("{path}")'
+                )
+                subprocess.run(["powershell", "-Command", ps], capture_output=True)
+            except Exception:
+                pass
+
         _cleanup_old_captures(keep_last=3)
         return path
 
     def _ocr(self, image_path):
-        """Run OCR on saved screenshot — always close the PIL Image after use."""
-        if not PIL_AVAILABLE:
-            return ""
-        try:
-            import pytesseract
-            img = Image.open(image_path)
+        """Run OCR on saved screenshot with active window title fallback."""
+        text = ""
+        if PIL_AVAILABLE:
             try:
-                text = pytesseract.image_to_string(img)
-            finally:
-                img.close()          # ← fix: always close
-            return text.strip()
-        except Exception as e:
-            print(f"OCR notice: {e}")
-            return ""
+                import pytesseract
+                img = Image.open(image_path)
+                try:
+                    text = pytesseract.image_to_string(img)
+                finally:
+                    img.close()
+                text = text.strip()
+            except Exception as e:
+                print(f"OCR notice: {e}")
+
+        if not text and platform.system() == "Windows":
+            try:
+                import ctypes
+                user32 = ctypes.windll.user32
+                hwnd = user32.GetForegroundWindow()
+                length = user32.GetWindowTextLengthW(hwnd)
+                buf = ctypes.create_unicode_buffer(length + 1)
+                user32.GetWindowTextW(hwnd, buf, length + 1)
+                win_title = buf.value.strip()
+                if win_title:
+                    text = f"Active Screen: {win_title}. Application running on desktop."
+            except Exception:
+                pass
+
+        return text
 
     def find_and_click_element(self, target_name):
         """Find target text on screen via OCR and click it; fallback to centre."""
@@ -150,7 +198,23 @@ class VisionAgent(BaseAgent):
                 max_tokens=200,
             )
             return {"success": True, "message": summary, "data": {"text": text, "summary": summary}}
-        return {"success": True, "message": "Screenshot taken but no text detected.", "data": {"path": path}}
+
+        if platform.system() == "Windows":
+            try:
+                import ctypes
+                user32 = ctypes.windll.user32
+                hwnd = user32.GetForegroundWindow()
+                length = user32.GetWindowTextLengthW(hwnd)
+                buf = ctypes.create_unicode_buffer(length + 1)
+                user32.GetWindowTextW(hwnd, buf, length + 1)
+                title = buf.value.strip()
+                if title:
+                    msg = f"Current screen active window: '{title}'. Screenshot captured to {os.path.basename(path)}."
+                    return {"success": True, "message": msg, "data": {"path": path, "window_title": title}}
+            except Exception:
+                pass
+
+        return {"success": True, "message": f"Screen screenshot captured to {os.path.basename(path)}.", "data": {"path": path}}
 
     def _ocr_region(self, params):
         path = self._capture()

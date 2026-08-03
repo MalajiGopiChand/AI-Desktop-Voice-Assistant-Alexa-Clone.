@@ -283,6 +283,29 @@ class CommandProcessor:
             r = self.agents["desktop_agent"].execute("reload_page", {})
             return r.get("message", "Reloaded page.")
 
+        # --- Screenshot Direct Protocol ---
+        if any(w in command for w in ("screenshot", "screen shot", "take screenshot", "capture screen", "screen capture", "snapshot")):
+            r = self.agents["desktop_agent"].execute("screenshot", {})
+            return r.get("message", "Screenshot taken successfully.")
+
+        # --- Volume Up / Down / Mute Direct Protocol ---
+        if any(w in command for w in ("volume up", "valume up", "increase volume", "raise volume", "volume high")):
+            r = self.agents["desktop_agent"].execute("volume_up", {})
+            return r.get("message", "Volume increased.")
+
+        if any(w in command for w in ("volume down", "valume down", "decrease volume", "lower volume", "volume low")):
+            r = self.agents["desktop_agent"].execute("volume_down", {})
+            return r.get("message", "Volume decreased.")
+
+        if any(w in command for w in ("mute volume", "unmute volume", "volume mute", "mute audio", "unmute audio")):
+            r = self.agents["desktop_agent"].execute("mute_volume", {})
+            return r.get("message", "Volume muted/unmuted.")
+
+        # --- Vision Screen OCR Direct Protocol ---
+        if any(p in command for p in ("read screen", "read my screen", "read current screen", "current screen will be read", "screen read", "read the screen", "ocr screen", "scan screen")):
+            r = self.agents["vision_agent"].execute("read_screen", {})
+            return r.get("message", "Screen text read successfully.")
+
         # --- Chrome Profile & Browser Protocols ---
         if "chrome" in command and "profile" in command:
             prof = command.split("profile")[-1].strip()
@@ -473,7 +496,109 @@ class CommandProcessor:
                 "confirmation_required": True
             }
 
+        if any(w in raw_cmd for w in ("camera", "cmarah", "webcam", "open camera", "open webcam")):
+            r = self.agents["desktop_agent"].execute("open_app", {"app_name": "camera"})
+            reply = r.get("message", "Opened Camera.")
+            return {
+                "status": "success",
+                "target": "desktop",
+                "agent": "DesktopAgent",
+                "action": "open_app",
+                "params": {"app_name": "camera"},
+                "spoken_reply": reply,
+                "response": reply,
+                "confirmation_required": False
+            }
+
+        if any(w in raw_cmd for w in ("close tab", "close the tab", "close current tab")):
+            r = self.agents["desktop_agent"].execute("close_tab", {})
+            reply = r.get("message", "Closed active tab.")
+            return {
+                "status": "success",
+                "target": "desktop",
+                "agent": "DesktopAgent",
+                "action": "close_tab",
+                "params": {},
+                "spoken_reply": reply,
+                "response": reply,
+                "confirmation_required": False
+            }
+
+        if any(w in raw_cmd for w in ("new tab", "open new tab", "open tab")):
+            r = self.agents["desktop_agent"].execute("new_tab", {})
+            reply = r.get("message", "Opened new tab.")
+            return {
+                "status": "success",
+                "target": "desktop",
+                "agent": "DesktopAgent",
+                "action": "new_tab",
+                "params": {},
+                "spoken_reply": reply,
+                "response": reply,
+                "confirmation_required": False
+            }
+
+        if any(w in raw_cmd for w in ("close window", "close new window", "close active window", "close current window")):
+            r = self.agents["desktop_agent"].execute("close_window", {})
+            reply = r.get("message", "Closed active window.")
+            return {
+                "status": "success",
+                "target": "desktop",
+                "agent": "DesktopAgent",
+                "action": "close_window",
+                "params": {},
+                "spoken_reply": reply,
+                "response": reply,
+                "confirmation_required": False
+            }
+
+        if any(w in raw_cmd for w in ("new window", "open new window")):
+            r = self.agents["desktop_agent"].execute("new_window", {})
+            reply = r.get("message", "Opened new window.")
+            return {
+                "status": "success",
+                "target": "desktop",
+                "agent": "DesktopAgent",
+                "action": "new_window",
+                "params": {},
+                "spoken_reply": reply,
+                "response": reply,
+                "confirmation_required": False
+            }
+
+        if any(w in raw_cmd for w in ("minimise the tab", "minimize the tab", "minimise tab", "minimize tab", "minimise window", "minimize window", "minimise", "minimize")):
+            r = self.agents["desktop_agent"].execute("minimize_window", {})
+            reply = r.get("message", "Minimized active window.")
+            return {
+                "status": "success",
+                "target": "desktop",
+                "agent": "DesktopAgent",
+                "action": "minimize_window",
+                "params": {},
+                "spoken_reply": reply,
+                "response": reply,
+                "confirmation_required": False
+            }
+
+
+        if any(w in raw_cmd for w in ("maximise the tab", "maximize the tab", "maximise tab", "maximize tab", "maximise window", "maximize window", "maximise", "maximize", "maximium")):
+            r = self.agents["desktop_agent"].execute("maximize_window", {})
+            reply = r.get("message", "Maximized active window.")
+            return {
+                "status": "success",
+                "target": "desktop",
+                "agent": "DesktopAgent",
+                "action": "maximize_window",
+                "params": {},
+                "spoken_reply": reply,
+                "response": reply,
+                "confirmation_required": False
+            }
+
         if "set alarm" in raw_cmd or "alarm for" in raw_cmd:
+
+
+
             return {
                 "status": "success",
                 "target": "mobile",

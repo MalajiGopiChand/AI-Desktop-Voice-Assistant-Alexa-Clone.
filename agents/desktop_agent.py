@@ -42,7 +42,23 @@ APP_MAP = {
     "copilot": "ms-copilot:",
     "co pilot": "ms-copilot:",
     "ko pilot": "ms-copilot:",
+    "camera": "microsoft.windows.camera:",
+    "cam": "microsoft.windows.camera:",
+    "webcam": "microsoft.windows.camera:",
+    "cmarah": "microsoft.windows.camera:",
+    "device manager": "devmgmt.msc",
+    "device manfwr": "devmgmt.msc",
+    "device manajr": "devmgmt.msc",
+    "devicemanger": "devmgmt.msc",
+    "device": "devmgmt.msc",
+    "control panel": "control",
+    "settings": "ms-settings:",
+    "system info": "msinfo32",
+    "cursor": "cursor",
 }
+
+
+
 
 
 class DesktopAgent(BaseAgent):
@@ -58,10 +74,20 @@ class DesktopAgent(BaseAgent):
                 "hotkey": self._hotkey,
                 "wait": self._wait,
                 "screenshot": self._screenshot,
+                "take_screenshot": self._screenshot,
                 "switch_window": self._switch_window,
                 "close_window": self._close_window,
+                "close_tab": self._close_tab,
+                "new_tab": self._new_tab,
+                "new_window": self._new_window,
                 "minimize_window": self._minimize_window,
+                "maximize_window": self._maximize_window,
                 "reload_page": self._reload_page,
+                "volume_up": self._volume_up,
+                "volume_down": self._volume_down,
+                "mute_volume": self._mute_volume,
+                "unmute_volume": self._mute_volume,
+
                 "open_folder": self._open_folder,
                 "move_file": self._move_file,
                 "rename_file": self._rename_file,
@@ -182,10 +208,59 @@ class DesktopAgent(BaseAgent):
         return {"success": True, "message": f"Waited {seconds}s", "data": {}}
 
     def _screenshot(self, params):
-        shot = pyautogui.screenshot()
+        from agents.vision_agent import VisionAgent
+        v = VisionAgent()
         path = params.get("path") or f"screenshot_{int(time.time())}.png"
-        shot.save(path)
+        captured_path = v._capture()
+        if captured_path and os.path.exists(captured_path):
+            try:
+                os.replace(captured_path, path)
+            except Exception:
+                path = captured_path
         return {"success": True, "message": f"Screenshot saved to {path}", "data": {"path": path}}
+
+    def _volume_up(self, params):
+        try:
+            if pyautogui:
+                for _ in range(5):
+                    pyautogui.press("volumeup")
+            else:
+                import ctypes
+                user32 = ctypes.windll.user32
+                for _ in range(5):
+                    user32.keybd_event(0xAF, 0, 0, 0)
+                    user32.keybd_event(0xAF, 0, 2, 0)
+            return {"success": True, "message": "Volume increased.", "data": {}}
+        except Exception as e:
+            return {"success": False, "message": f"Volume up error: {e}", "data": {}}
+
+    def _volume_down(self, params):
+        try:
+            if pyautogui:
+                for _ in range(5):
+                    pyautogui.press("volumedown")
+            else:
+                import ctypes
+                user32 = ctypes.windll.user32
+                for _ in range(5):
+                    user32.keybd_event(0xAE, 0, 0, 0)
+                    user32.keybd_event(0xAE, 0, 2, 0)
+            return {"success": True, "message": "Volume decreased.", "data": {}}
+        except Exception as e:
+            return {"success": False, "message": f"Volume down error: {e}", "data": {}}
+
+    def _mute_volume(self, params):
+        try:
+            if pyautogui:
+                pyautogui.press("volumemute")
+            else:
+                import ctypes
+                user32 = ctypes.windll.user32
+                user32.keybd_event(0xAD, 0, 0, 0)
+                user32.keybd_event(0xAD, 0, 2, 0)
+            return {"success": True, "message": "Volume muted/unmuted.", "data": {}}
+        except Exception as e:
+            return {"success": False, "message": f"Volume mute error: {e}", "data": {}}
 
     def _switch_window(self, params):
         pyautogui.hotkey("alt", "tab")
@@ -193,8 +268,33 @@ class DesktopAgent(BaseAgent):
         return {"success": True, "message": "Switched window", "data": {}}
 
     def _close_window(self, params):
-        pyautogui.hotkey("alt", "f4")
+        try:
+            pyautogui.hotkey("alt", "f4")
+        except Exception:
+            pass
         return {"success": True, "message": "Closed active window", "data": {}}
+
+    def _close_tab(self, params):
+        try:
+            pyautogui.hotkey("ctrl", "w")
+        except Exception:
+            pass
+        return {"success": True, "message": "Closed active tab", "data": {}}
+
+    def _new_tab(self, params):
+        try:
+            pyautogui.hotkey("ctrl", "t")
+        except Exception:
+            pass
+        return {"success": True, "message": "Opened new tab", "data": {}}
+
+    def _new_window(self, params):
+        try:
+            pyautogui.hotkey("ctrl", "n")
+        except Exception:
+            pass
+        return {"success": True, "message": "Opened new window", "data": {}}
+
 
     def _open_folder(self, params):
         path = params.get("path", os.path.expanduser("~"))
@@ -243,16 +343,30 @@ class DesktopAgent(BaseAgent):
     def _minimize_window(self, params):
         if platform.system() == "Windows":
             try:
-                # Win32 API: SW_MINIMIZE = 6 — most reliable method
                 user32 = ctypes.windll.user32
                 hwnd = user32.GetForegroundWindow()
                 if hwnd:
                     user32.ShowWindow(hwnd, 6)   # 6 = SW_MINIMIZE
-                else:
-                    pyautogui.hotkey("win", "m")
+                    user32.ShowWindow(hwnd, 2)   # 2 = SW_SHOWMINIMIZED
+                pyautogui.hotkey("win", "down")
+                pyautogui.hotkey("win", "down")
             except Exception:
-                pyautogui.hotkey("win", "m")
+                pyautogui.hotkey("win", "d")
         return {"success": True, "message": "Minimized active window", "data": {}}
+
+    def _maximize_window(self, params):
+        if platform.system() == "Windows":
+            try:
+                user32 = ctypes.windll.user32
+                hwnd = user32.GetForegroundWindow()
+                if hwnd:
+                    user32.ShowWindow(hwnd, 3)   # 3 = SW_MAXIMIZE
+                pyautogui.hotkey("win", "up")
+            except Exception:
+                pyautogui.hotkey("win", "up")
+        return {"success": True, "message": "Maximized active window", "data": {}}
+
+
 
     def _reload_page(self, params):
         try:
