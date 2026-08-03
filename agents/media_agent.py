@@ -1,8 +1,34 @@
 """Media control — Spotify, YouTube, HTML5 browser video, system media keys."""
 import pyautogui
+import ctypes
+import os
 from agents.base_agent import BaseAgent
 
 pyautogui.FAILSAFE = False
+
+# Windows Virtual Key Codes for System Media Control
+VK_MEDIA_NEXT_TRACK = 0xB0  # 176
+VK_MEDIA_PREV_TRACK = 0xB1  # 177
+VK_MEDIA_STOP = 0xB2        # 178
+VK_MEDIA_PLAY_PAUSE = 0xB3  # 179
+VK_VOLUME_MUTE = 0xAD       # 173
+VK_VOLUME_DOWN = 0xAE       # 174
+VK_VOLUME_UP = 0xAF         # 175
+
+KEYEVENTF_EXTENDEDKEY = 0x0001
+KEYEVENTF_KEYUP = 0x0002
+
+
+def send_hardware_media_key(vk_code):
+    """Sends hardware-level Windows media key event system-wide."""
+    try:
+        if os.name == 'nt':
+            ctypes.windll.user32.keybd_event(vk_code, 0, KEYEVENTF_EXTENDEDKEY, 0)
+            ctypes.windll.user32.keybd_event(vk_code, 0, KEYEVENTF_EXTENDEDKEY | KEYEVENTF_KEYUP, 0)
+            return True
+    except Exception as e:
+        print(f"Hardware media key error: {e}")
+    return False
 
 
 class MediaAgent(BaseAgent):
@@ -11,18 +37,18 @@ class MediaAgent(BaseAgent):
 
     def execute(self, action, params):
         try:
-            import keyboard
-
             def _play_pause():
-                try:
-                    pyautogui.press("playpause")
-                except Exception:
-                    pass
-                try:
-                    pyautogui.press("k")
-                except Exception:
-                    pass
-
+                # 1. Try hardware-level Windows media key first
+                sent = send_hardware_media_key(VK_MEDIA_PLAY_PAUSE)
+                if not sent:
+                    try:
+                        pyautogui.press("playpause")
+                    except Exception:
+                        pass
+                    try:
+                        pyautogui.press("space")
+                    except Exception:
+                        pass
 
             def _seek_forward():
                 try:
@@ -45,10 +71,29 @@ class MediaAgent(BaseAgent):
                     pass
 
             def _mute():
-                try:
-                    pyautogui.press("m")
-                except Exception:
-                    pass
+                sent = send_hardware_media_key(VK_VOLUME_MUTE)
+                if not sent:
+                    try:
+                        pyautogui.press("m")
+                    except Exception:
+                        pass
+
+            def _next_track():
+                sent = send_hardware_media_key(VK_MEDIA_NEXT_TRACK)
+                if not sent:
+                    try:
+                        pyautogui.press("nexttrack")
+                        pyautogui.hotkey("shift", "n")
+                    except Exception:
+                        pass
+
+            def _previous_track():
+                sent = send_hardware_media_key(VK_MEDIA_PREV_TRACK)
+                if not sent:
+                    try:
+                        pyautogui.press("prevtrack")
+                    except Exception:
+                        pass
 
             def _auto_click_first_video():
                 import time
@@ -57,7 +102,7 @@ class MediaAgent(BaseAgent):
                     screen_w, screen_h = pyautogui.size()
                     pyautogui.click(screen_w // 2, int(screen_h * 0.35))
                     time.sleep(0.5)
-                    pyautogui.press("k")
+                    _play_pause()
                 except Exception:
                     pass
 
@@ -71,7 +116,7 @@ class MediaAgent(BaseAgent):
                     x_pos = screen_w // 2
                     pyautogui.click(x_pos, y_pos)
                     time.sleep(0.5)
-                    pyautogui.press("k")
+                    _play_pause()
                 except Exception:
                     pass
 
@@ -86,11 +131,11 @@ class MediaAgent(BaseAgent):
                 "mute_video": _mute,
                 "auto_play_video": _auto_click_first_video,
                 "play_ordinal_video": lambda: _play_ordinal_video(params),
-                "next_track": lambda: [pyautogui.press("nexttrack"), pyautogui.hotkey("shift", "n")],
-                "previous_track": lambda: pyautogui.press("prevtrack"),
-                "volume_up": lambda: [pyautogui.press("volumeup") for _ in range(3)],
-                "volume_down": lambda: [pyautogui.press("volumedown") for _ in range(3)],
-                "open_spotify": lambda: __import__("os").system("start spotify:"),
+                "next_track": _next_track,
+                "previous_track": _previous_track,
+                "volume_up": lambda: [send_hardware_media_key(VK_VOLUME_UP) for _ in range(3)],
+                "volume_down": lambda: [send_hardware_media_key(VK_VOLUME_DOWN) for _ in range(3)],
+                "open_spotify": lambda: os.system("start spotify:"),
             }
             fn = actions.get(action)
             if not fn:
