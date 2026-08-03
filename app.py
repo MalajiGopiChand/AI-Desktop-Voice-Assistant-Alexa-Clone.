@@ -58,12 +58,13 @@ def handle_command():
     structured = processor.process_structured(lower, model=model)
 
     reply = structured.get("spoken_reply") or structured.get("response") or ""
-    if reply:
+    if reply and data.get("speak_server", False):
         speak(reply)
     else:
         set_widget_state("idle")
 
     return jsonify(structured)
+
 
 
 @app.route("/api/sync/memory", methods=["GET", "POST"])

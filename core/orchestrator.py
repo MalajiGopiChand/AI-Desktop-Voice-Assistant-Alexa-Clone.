@@ -49,10 +49,11 @@ class Orchestrator:
                 response = processor.process(
                     command,
                     confirm_callback=voice_engine.listen_for_confirmation,
-                    speak_callback=voice_engine.speak,
+                    speak_callback=None,
                 )
                 if response:
                     voice_engine.speak(response)
+
 
             except Exception as e:
                 print(f"Orchestrator error: {e}")
