@@ -1,4 +1,4 @@
-# 🤖 METIS AI Operating System — Executive Presentation & Technical Manual
+# 🤖 METIS AI Operating System 
 
 [![Python](https://img.shields.io/badge/Python-3.10%2B-blue.svg)](https://www.python.org/)
 [![Framework](https://img.shields.io/badge/Framework-Flask%20%7C%20React%2018-green.svg)](https://react.dev/)
