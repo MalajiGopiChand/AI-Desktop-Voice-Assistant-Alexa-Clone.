@@ -10,7 +10,7 @@ A production-grade, multimodal AI Operating System featuring **16 autonomous age
 
 ---
 
-## 🌟 Key Highlights & Architecture Presentation
+## 🌟 Key Highlights & Architecture 
 
 ### 1. Unified Multimodal Pipeline
 Metis processes inputs seamlessly across **Voice (Speech-to-Text)**, **Web UI (React 18 & Babel JSX)**, **Mobile PWA Touch**, and **REST API Endpoints**, routing queries through intent classifiers to specialized agents.
